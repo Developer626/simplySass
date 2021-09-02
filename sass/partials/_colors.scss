@@ -1,0 +1,234 @@
+// TODO Make a color checkers to help users know the if text will be visible, 
+// Maybe a function that will output two color that is visible that takes in 
+// the colors being tested ($background, $text-color), a minimum contrast level
+// ($contrast: 50% <-- in percentage) to have between the two colors, and outputs
+// a list of colors on either side of the text-color that matches the requirements
+
+@use "sass:math";
+@use "sass:color";
+@use "sass:list";
+
+
+// TODO Add a comment for this function.
+@function analogous(
+    $primary,
+    $count: 2,
+    $deg: 30deg,
+    $reverse: false,
+    $one-sided: false
+    ){
+        $deg-change: $deg;
+        $returner: [];
+        $returner: list.append($returner, $primary);
+
+
+        @if $reverse {
+
+            $reverse: -1;
+            $deg: $deg * $reverse;
+
+        }@else {
+
+            $reverse: -1;
+
+        }
+
+        // If the user wants the colors to be taken from one side of the primary color.
+        @if $one-sided {
+
+            @for $i from 1 through $count { // $i <= $count
+
+                $returner: list.append($returner, color.adjust($primary, $hue: $deg));
+    
+                @if $deg > 0 {
+    
+                    $deg: $deg + $deg-change;
+
+                }@else {
+
+                    $deg: $deg - $deg-change;
+
+                }
+
+                @if $deg > 360 or $deg < -360 {
+                    
+                    @debug "$deg must not be bigger than 360 or smaller than -360.";
+                
+                    @return $returner;
+                }
+    
+            }
+            @return $returner;
+        }
+
+
+        // If the users want colors from both sides of the primary color.
+        @for $i from 1 through $count { // $i <= $count
+
+            $returner: list.append($returner, color.adjust($primary, $hue: $deg));
+
+            $deg: $deg * $reverse;
+
+            @if math.ceil(math.div($i, 2)) == math.floor(math.div($i, 2)){
+                
+                @if $deg > 0 {
+
+                    $deg: $deg + $deg-change;
+
+                }@else {
+
+                    $deg: $deg - $deg-change;
+
+                }
+                
+            }
+
+            @if $deg > 360 or $deg < -360 {
+
+                @debug "$deg must not be bigger than 360deg or smaller than -360deg.";
+                
+                @return $returner;
+            }
+        }
+        @return $returner;
+}
+
+
+// This function simply returns the color that is opposite the color that is sent on the color wheel.
+// TODO Maybe make this function out put some shades of side, because just writing the bellow code is better if all it does is outout one color.
+// TODO Split complemnetory, shades of the complemetory, shades of the primary? How many of each? This might be better implemented as just Sass code.
+// TODO Remove?
+@function complementory(
+    $primary
+    ){
+        @return complement($primary);
+}
+
+
+// TODO Have a $one-sided variable?
+// This function takes in a primary color to work with, how many colors to produce,
+// the amount to change the next color by, and what kind of color attribute to alter.
+@function monochrome(
+    $primary,
+    $count: 2,
+    $changeby: 20%,
+    $saturation: false, // HSL
+    $lightness: false, // HSL
+    $whiteness: false, // HWB
+    $blackness: false // HWB
+    ){
+        $total-change: $changeby;
+        $returner: [];
+        $returner: list.append($returner, $primary);
+
+
+        @for $i from 1 through $count {
+
+            // Saturation is part of the HSL color model
+            @if $saturation {
+                $returner: list.append($returner, color.scale($color: $primary, $saturation: $total-change));
+            }
+
+            // Lightness is part of the HSL color model
+            @if $lightness {
+                $returner: list.append($returner, color.scale($color: $primary, $lightness: $total-change));
+            }
+
+            // Whiteness is part of the HWB color model
+            @if $whiteness {
+                $returner: list.append($returner, color.scale($color: $primary, $whiteness: $total-change));
+            }
+
+            // Blackness is part of the HWB color model
+            @if $blackness {
+                $returner: list.append($returner, color.scale($color: $primary, $blackness: $total-change));
+            }
+
+            $total-change: $total-change + $changeby;
+        }
+
+    @return $returner;
+}
+
+
+// Tetradic
+// This function takes in a primary color to start with and the degree at which to
+// get it comlementory color the secondary color and its comlementory color. It outputs four colors.
+@function tetradic(
+    $primary,
+    $deg: 90deg
+    ){
+        // Save the primary color
+        $returner: [];
+        $returner: list.append($returner, $primary);
+
+        // Save the primary's complementory color
+        $returner: list.append($returner, color.complement($primary));
+        
+        // Save the offset's color
+        $returner: list.append($returner, color.adjust($primary, $hue: $deg));
+
+        // Save the offset's complementoy color
+        $returner: list.append($returner, color.complement(nth($returner, 3)));
+
+        @return $returner;
+}
+
+// Triadic
+// This function takes a primary color and a degree to move from it and outputs three colors.
+@function triadic(
+    $primary,
+    $deg: 120deg // 165deg for a split complementory.
+    ){
+        @return analogous($primary, 2, $deg);
+}
+
+
+
+// Takes two colors and the steps to make between the two.
+// Outputs a list of colors between the two it received.
+@function gradient-palette-maker(
+    $color1,
+    $color2,
+    $steps: 1
+    ){
+        $returner: [];
+        $returner: list.append($returner, $color1);
+        
+        $percentage: math.percentage(math.div(math.div(100, (1 + $steps)), 100)); // This mixes colors using the sRBG color space?
+        $percentage-change: $percentage;
+
+        
+
+        @for $i from 1 through $steps {
+
+            $holder: color.mix($color2, $color1, $percentage);
+
+            $returner: list.append($returner, $holder);
+
+            $percentage: $percentage + $percentage-change;
+        }
+
+        $returner: list.append($returner, $color2);
+
+        @return $returner;
+
+}
+
+
+// TODO Have it take in a list for both the mix-color and mix-weight
+// Takes in a list of colors, a color to mix into each of them, and the percentage to mix on them.
+// Output a list of the new palette.
+@function color-palette-mixer(
+    $palette,
+    $mix-color,
+    $mix-weight: 20%
+    ){
+        $returner: [];
+
+        @each $color in $palette {
+            $returner: list.append($returner, color.mix($mix-color, $color, $mix-weight)); // This mixes colors using the sRBG color space?
+        }
+
+        @return $returner;
+}

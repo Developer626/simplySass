@@ -1,0 +1,1534 @@
+
+// TODO git init and commtt this code
+// TODO Then Clean up code
+// TODO Add some more comments to the code
+// TODO Create Readme.md
+// TODO Put a license on this project
+// TODO Commit new version of project
+
+// TODO Future idea, Make the .grid-item* take a chosen name from the user so they have more control?
+// TODO Based on the idea above, have the grid-item do it all. Have it check for the type then <number>, 
+// <list>, and <map> then respon accordingly.
+
+@use "sass:list";
+@use "sass:string";
+
+
+// Variables to make using this set of mixins easier.
+// TODO pick and easier one to use from the latter four.
+$standard-tablet-threshold: 426px;
+$standard-desktop-threshold:769px;
+$s-t-t: $standard-tablet-threshold;
+$s-d-t: $standard-desktop-threshold;
+$stt: $standard-tablet-threshold;
+$sdt: $standard-desktop-threshold;
+
+// This gets added when _grid.scss is called.
+.grid{
+    height: var(--height, auto);
+    width: var(--width, 100%);
+    background: var(--bg, none);
+
+    display: grid;
+    grid-template-columns: var(--cols, 1fr);
+    grid-template-rows: var(--rows, 1fr);
+    grid-column-gap: var(--col-gap, 0);
+    grid-row-gap: var(--row-gap, 0);
+    grid-template-areas: var(--ga, "");
+}
+
+// Makers for the item holders.
+@mixin grid-item($n: 1){
+    @for $i from 1 through $n {
+        .grid-item-#{$i}{
+            grid-area: var(--grid-item-#{$i});
+            @content;
+        }
+    }
+}
+
+
+// It takes <name> or <row-start> / <col-start> / <row-end> / <col-end>
+
+// $list can be a list of <strings> or a <map>
+@mixin grid-item-area($list){
+
+    // Check to see if the user sent a map or a list.
+    @if type-of($list) == type-of(("":"")) {
+        
+        @each $name, $area in $list {
+            .grid-item-area-#{$name}{
+                grid-area: #{$area};
+                @content;
+            }
+        }
+
+    }@else {
+        $count: 1;
+        @each $name in $list {
+
+            @if string.index($name, "/") == null{
+                .grid-item-area-#{$name}{
+                    grid-area: #{$name};
+                    @content;
+                }
+            }@else {
+                .grid-item-area-#{$count}{
+                    grid-area: #{$name};
+                    @content;
+                }
+
+                $count: $count + 1;
+            }
+        }
+    }
+}
+
+
+@mixin sub-grid-item($n: 1){
+    @for $i from 1 through $n {
+        .sub-grid-item-#{$i}{
+            grid-area: var(--sub-grid-item-#{$i});
+            @content;
+        }
+    }
+}
+
+@mixin sub-grid-item-area($list){
+    
+    // Check to see if the user sent a map or a list.
+    @if type-of($list) == type-of(("":"")) {
+        
+        @each $name, $area in $list {
+            .sub-grid-item-area-#{$name}{
+                grid-area: #{$area};
+                @content;
+            }
+        }
+
+    }@else {
+
+        $count: 1;
+        @each $name in $list {
+
+            @if string.index($name, "/") == null{
+                .sub-grid-item-area-#{$name}{
+                    grid-area: #{$name};
+                    @content;
+                }
+            }@else {
+                .sub-grid-item-area-#{$count}{
+                    grid-area: #{$name};
+                    @content;
+                }
+
+                $count: $count + 1;
+            }
+        }
+    }
+}
+
+
+
+@mixin _grid(
+            // How to size the grid and align/justify the items.
+            $height: auto,
+            $width: 100%,
+            $background: none,
+            $justify-items: center,
+            $align-items: top,
+            
+            // How many columns and rows to make.
+            $cols: 1,
+            $col-repeat: 1,
+            $rows: 1,
+            $row-repeat: 1,
+            // $items, // TODO Do I still need this?
+            $grid-area: null,
+            
+            // How to pad the grid inside and out.
+            $col-gap: 0,
+            $row-gap: 0,
+            $side-padding: 20px, // Original: 10%
+            $top-padding: 0,
+            $bottom-padding: 0,
+            
+            // Where to put the threshold and how to set it up for Tablet.
+            $tablet-threshold: 0,
+            $tablet-height: auto,
+            $tablet-width: 100%,
+            $tablet-background: none,
+            $tablet-cols: 1,
+            $tablet-col-repeat: 1,
+            $tablet-rows: 1,
+            $tablet-row-repeat: 1,
+            $tablet-grid-area: null,
+            $tablet-side-padding: 15px,
+            $tablet-top-padding: 0,
+            $tablet-bottom-padding: 0,
+            $tablet-col-gap: 0,
+            $tablet-row-gap: 0,
+            $tablet-justify-items: center,
+            $tablet-align-items: top,
+            
+            // Where to put the threshold and how to set it up for Desktop.
+            $desktop-threshold: 0,
+            $desktop-height: auto,
+            $desktop-width: 100%,
+            $desktop-background: none,
+            $desktop-cols: 1,
+            $desktop-col-repeat: 1,
+            $desktop-rows: 1,
+            $desktop-row-repeat: 1,
+            $desktop-grid-area: null,
+            $desktop-side-padding: 15px,
+            $desktop-top-padding: 0,
+            $desktop-bottom-padding: 0,
+            $desktop-col-gap: 0,
+            $desktop-row-gap: 0,
+            $desktop-justify-items: center,
+            $desktop-align-items: top){
+    
+    //Setup some variables that won't change for this screen size here.
+    --height: #{$height};
+    --width: #{$width};
+    --bg: #{$background};
+    justify-items: #{$justify-items};  // TODO Should I write this code into the .grid like the others in this code section?
+    align-items: #{$align-items};
+    --col-gap: #{$col-gap};
+    --row-gap: #{$row-gap};
+
+    // Making $grid-area a string, with quotes.
+    // This will allow this mixin to take in a list and properly output it in CSS.
+    @if $grid-area != null {
+        $temp: null;
+        @each $area in $grid-area {
+            $temp: $temp + "\"" + $area + "\" ";
+        }
+        $grid-area: $temp;
+
+        --ga: #{$grid-area}; 
+    }
+    
+
+    @if type-of(1) != type-of($cols){
+        
+        // Put user manual setup of cols here
+        --cols: [grid-col-start] #{$side-padding} repeat(#{$col-repeat}, #{$cols}) #{$side-padding} [grid-col-end];
+
+        $col-repeat: list.length($cols) * $col-repeat;
+
+    }@else if $col-repeat > 0 {
+        --cols:  [grid-col-start] #{$side-padding} [col-start] repeat(#{$col-repeat}, [col] 1fr) [col-end] #{$side-padding} [grid-col-end];
+    }
+
+    @if type-of(1) != type-of($rows){
+        // Put user manual setup of cols here
+        --rows: [grid-row-start] repeat(#{$row-repeat}, #{$rows}) [grid-row-end];
+
+        $row-repeat: list.length($rows) * $row-repeat;
+
+    }@else if $row-repeat > 0 {
+        --rows: [grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [grid-row-end];
+    }
+
+     
+    @if $col-repeat > 0 and $row-repeat > 0{
+        $count: 1;
+        @for $i from 1 through $row-repeat{
+            @for $j from 1 through $col-repeat{
+                --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+                $count: $count + 1;
+            }
+        }
+    }
+    
+
+    // Changes for different layouts/screen sizes.
+    @if type-of($tablet-threshold) == type-of(0) and $tablet-threshold > 0 {
+        @media screen and (min-width: $tablet-threshold){
+        
+            // The if statements bellow allow us to stop code from repeating itself needlessly.
+            // @if $height != $tablet-height {
+            //     --height: #{$tablet-height};
+            // }
+            // @if $width != $tablet-width {
+            //     --width: #{$tablet-width};
+            // }
+            // @if $background != $tablet-background {
+            //     --bg: #{$tablet-background};
+            // }
+    
+            @if $justify-items != $tablet-justify-items {
+                justify-items: #{$tablet-justify-items};
+            }
+            @if $align-items != $tablet-align-items {
+                align-items: #{$tablet-align-items};
+            }
+            @if $col-gap != $tablet-col-gap {
+                --col-gap: #{$tablet-col-gap};
+            }
+            @if $row-gap != $tablet-row-gap {
+                --row-gap: #{$tablet-row-gap};
+            }
+            @if $tablet-grid-area != null {
+                $temp: null;
+                @each $area in $tablet-grid-area {
+                    $temp: $temp + "\"" + $area + "\" ";
+                }
+                $tablet-grid-area: $temp;
+                --ga: #{$tablet-grid-area};
+            }
+            
+    
+            // Check to see what type of grid setup to use.
+            @if type-of(1) != type-of($tablet-cols){
+                // Put user manual setup of cols here
+                --cols: [grid-col-start] #{$tablet-side-padding} repeat(#{$tablet-col-repeat}, #{$tablet-cols}) #{$tablet-side-padding} [grid-col-end];
+
+                $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+        
+            }@else if $tablet-col-repeat > 0 {
+                --cols:  [grid-col-start] #{$tablet-side-padding} [col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [col-end] #{$tablet-side-padding} [grid-col-end];
+            }
+    
+            @if type-of(1) != type-of($tablet-rows){
+                // Put user manual setup of cols here
+                --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [grid-row-end];
+
+                $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
+        
+            }@else if $tablet-row-repeat > 0 {
+                --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [grid-row-end];
+            }
+    
+            // Check and setup the layout of the items, if able to.
+            @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+                $count: 1;
+                @for $i from 1 through $tablet-row-repeat{
+                    @for $j from 1 through $tablet-col-repeat{
+                        --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }
+        }
+    }
+
+
+    // Check to see if the $desktop-threshold has been changed, and add a desktop code if it has.
+    @if type-of($desktop-threshold) == type-of(0) and $desktop-threshold > 0 {
+        @media screen and (min-width: $desktop-threshold){
+            // The bellow code may be needed later.
+            // @if $height != $desktop-height {
+            //     --height: #{$desktop-height};
+            // }
+            // @if $width != $desktop-width {
+            //     --width: #{$desktop-width};
+            // }
+            // @if $background != $desktop-background {
+            //     --bg: #{$desktop-background};
+            // }
+    
+            @if $justify-items != $desktop-justify-items {
+                justify-items: #{$desktop-justify-items};
+            }
+            @if $align-items != $desktop-align-items {
+                align-items: #{$desktop-align-items};
+            }
+            @if $col-gap != $desktop-col-gap {
+                --col-gap: #{$desktop-col-gap};
+            }
+            @if $row-gap != $desktop-row-gap {
+                --row-gap: #{$desktop-row-gap};
+            }
+            @if $desktop-grid-area != null {
+                $temp: null;
+                @each $area in $desktop-grid-area {
+                    $temp: $temp + "\"" + $area + "\" ";
+                }
+                $desktop-grid-area: $temp;
+                --ga: #{$desktop-grid-area};
+            }
+    
+            
+
+            // Check to see what type of grid setup to use.
+            @if type-of(1) != type-of($desktop-cols){
+                // Put user manual setup of cols here
+                --cols: [grid-col-start] #{$desktop-side-padding} repeat(#{$desktop-col-repeat}, #{$desktop-cols}) #{$desktop-side-padding} [grid-col-end];
+
+                $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
+        
+            }@else if $desktop-col-repeat > 0 {
+                --cols:  [grid-col-start] #{$desktop-side-padding} [col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [col-end] #{$desktop-side-padding} [grid-col-end];
+            }
+    
+            @if type-of(1) != type-of($desktop-rows){
+                // Put user manual setup of cols here
+                --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [grid-row-end];
+
+                $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
+        
+            }@else if $desktop-row-repeat > 0 {
+                --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, [row] 1fr) [grid-row-end];
+            }
+    
+            // Check and setup the layout of the items, if able to.
+            @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0{
+                $count: 1;
+                @for $i from 1 through $desktop-row-repeat{
+                    @for $j from 1 through $desktop-col-repeat{
+                        --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+
+// Sub-grid is a grid without any type of padding.
+@mixin _sub-grid(
+            // How to size the grid and align/justify the items.
+            $height: auto,
+            $width: 100%,
+            $background: none,
+            $justify-items: center,
+            $align-items: top,
+            
+            // How many columns and rows to make.
+            $cols: 1,
+            $col-repeat: 1,
+            $rows: 1,
+            $row-repeat: 1,
+            // $items, // TODO Do I still need this?
+            $grid-area: null,
+            
+            // How much space to create between the sub-grid's boxes.
+            $col-gap: 0,
+            $row-gap: 0,
+
+            // Where to put the threshold and how to set it up for mobile.
+            $tablet-threshold: 0, // Original: 425px,
+            $tablet-height: auto,
+            $tablet-width: 100%,
+            $tablet-background: none,
+            $tablet-cols: 1,
+            $tablet-col-repeat: 1,
+            $tablet-rows: 1,
+            $tablet-row-repeat: 1,
+            $tablet-grid-area: null,
+            $tablet-col-gap: 0,
+            $tablet-row-gap: 0,
+            $tablet-justify-items: center,
+            $tablet-align-items: top,
+            
+            // Where to put the threshold and how to set it up for tablet.
+            $desktop-threshold: 0,
+            $desktop-height: auto,
+            $desktop-width: 100%,
+            $desktop-background: none,
+            $desktop-cols: 1,
+            $desktop-col-repeat: 1,
+            $desktop-rows: 1,
+            $desktop-row-repeat: 1,
+            $desktop-grid-area: null,
+            $desktop-col-gap: 0,
+            $desktop-row-gap: 0,
+            $desktop-justify-items: center,
+            $desktop-align-items: top){
+    
+    //Setup some variables that won't change for this screen size here.
+    --height: #{$height};
+    --width: #{$width};
+    --bg: #{$background};
+    justify-items: #{$justify-items};
+    align-items: #{$align-items};
+    --col-gap: #{$col-gap};
+    --row-gap: #{$row-gap};
+    
+
+    // Making $grid-area a string, with quotes.
+    // This will format a list of strings so the CSS code will recognise it.
+    @if $grid-area != null {
+        $temp: null;
+        @each $area in $grid-area {
+            $temp: $temp + "\"" + $area + "\" ";
+        }
+        $grid-area: $temp;
+
+        --ga: #{$grid-area}; 
+    }
+
+    
+
+    // Check to see what type of grid setup to use.
+    @if type-of(1) != type-of($cols){
+        // Put user manual setup of cols here
+        --cols: [sub-grid-col-start]  repeat(#{$col-repeat}, #{$cols})  [sub-grid-col-end];
+
+        $col-repeat: list.length($cols) * $col-repeat;
+
+    }@else if $col-repeat > 0 {
+        --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
+    }
+
+    @if type-of(1) != type-of($rows){
+        // Put user manual setup of cols here
+        --rows: [sub-grid-row-start] repeat(#{$row-repeat}, #{$rows}) [sub-grid-row-end];
+
+        $row-repeat: list.length($rows) * $row-repeat;
+
+    }@else if $row-repeat > 0 {
+        --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [sub-grid-row-end];
+    }
+
+    // Check and setup the layout of the items, if able to.
+    @if $col-repeat > 0 and $row-repeat > 0{
+        $count: 1;
+        @for $i from 1 through $row-repeat{
+            @for $j from 1 through $col-repeat{
+                --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                $count: $count + 1;
+            }
+        }
+    }
+    
+
+    // Changes for the screen sizes.
+    @if type-of($tablet-threshold) == type-of(0) and $tablet-threshold > 0 {
+        @media screen and (min-width: $tablet-threshold){
+        
+            // The if statements bellow allow us to stop code from repeating itself needlessly.
+            @if $height != $tablet-height {
+                --height: #{$tablet-height};
+            }
+            @if $width != $tablet-width {
+                --width: #{$tablet-width};
+            }
+            @if $background != $tablet-background {
+                --bg: #{$tablet-background};
+            }
+    
+            @if $justify-items != $tablet-justify-items {
+                justify-items: #{$tablet-justify-items};
+            }
+            @if $align-items != $tablet-align-items {
+                align-items: #{$tablet-align-items};
+            }
+            @if $col-gap != $tablet-col-gap {
+                --col-gap: #{$tablet-col-gap};
+            }
+            @if $row-gap != $tablet-row-gap {
+                --row-gap: #{$tablet-row-gap};
+            }
+            @if $tablet-grid-area != null {
+                $temp: null;
+                @each $area in $tablet-grid-area {
+                    $temp: $temp + "\"" + $area + "\" ";
+                }
+                $tablet-grid-area: $temp;
+                --ga: #{$tablet-grid-area};
+            }
+            
+
+            // Check to see what type of grid setup to use.
+            @if type-of(1) != type-of($tablet-cols){
+                // Put user manual setup of cols here
+                --cols: [sub-grid-col-start] repeat(#{$tablet-col-repeat}, #{$tablet-cols}) [sub-grid-col-end];
+
+                $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+        
+            }@else if $tablet-col-repeat > 0 {
+                --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
+            }
+    
+            @if type-of(1) != type-of($tablet-rows){
+                // Put user manual setup of cols here
+                --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [sub-grid-row-end];
+
+                $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
+        
+            }@else if $tablet-row-repeat > 0 {
+                --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [sub-grid-row-end];
+            }
+    
+            // Check and setup the layout of the items, if able to.
+            @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+                $count: 1;
+                @for $i from 1 through $tablet-row-repeat{
+                    @for $j from 1 through $tablet-col-repeat{
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }
+        }
+    }
+
+
+    @if type-of($desktop-threshold) == type-of(0) and $desktop-threshold > 0 {
+        @media screen and (min-width: $desktop-threshold){
+            @if $height != $desktop-height {
+                --height: #{$desktop-height};
+            }
+            @if $width != $desktop-width {
+                --width: #{$desktop-width};
+            }
+            @if $background != $desktop-background {
+                --bg: #{$desktop-background};
+            }
+    
+            @if $justify-items != $desktop-justify-items {
+                justify-items: #{$desktop-justify-items};
+            }
+            @if $align-items != $desktop-align-items {
+                align-items: #{$desktop-align-items};
+            }
+            @if $col-gap != $desktop-col-gap {
+                --col-gap: #{$desktop-col-gap};
+            }
+            @if $row-gap != $desktop-row-gap {
+                --row-gap: #{$desktop-row-gap};
+            }
+            @if $desktop-grid-area != null {
+                $temp: null;
+                @each $area in $desktop-grid-area {
+                    $temp: $temp + "\"" + $area + "\" ";
+                }
+                $desktop-grid-area: $temp;
+                --ga: #{$desktop-grid-area};
+            }
+    
+            
+
+            // Check to see what type of grid setup to use.
+            @if type-of(1) != type-of($desktop-cols){
+                // Put user manual setup of cols here
+                --cols: [sub-grid-col-start] repeat(#{$desktop-col-repeat}, #{$desktop-cols}) [sub-grid-col-end];
+
+                $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
+        
+            }@else if $desktop-col-repeat > 0 {
+                --cols:  [sub-grid-col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [sub-grid-col-end];
+            }
+    
+            @if type-of(1) != type-of($desktop-rows){
+                // Put user manual setup of cols here
+                --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [sub-grid-row-end];
+
+                $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
+        
+            }@else if $desktop-row-repeat > 0 {
+                --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, [row] 1fr) [sub-grid-row-end];
+            }
+    
+            // Check and setup the layout of the items, if able to.
+            @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0{
+                $count: 1;
+                @for $i from 1 through $desktop-row-repeat{
+                    @for $j from 1 through $desktop-col-repeat{
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+// @mixin _grid(
+//             // How to size the grid and align/justify the items.
+//             $height: auto,
+//             $width: 100%,
+//             $background: none,
+//             $justify-items: center,
+//             $align-items: top,
+            
+//             // How many columns and rows to make.
+//             $cols: 1,
+//             $col-repeat: 1,
+//             $rows: 1,
+//             $row-repeat: 1,
+//             // $items, // TODO Do I still need this?
+//             $grid-area: null,
+            
+//             // How to pad the grid inside and out.
+//             $col-gap: 0,
+//             $row-gap: 0,
+//             $side-padding: 20px, // Original: 10%
+//             $top-padding: 0,
+//             $bottom-padding: 0,
+            
+//             // Where to put the threshold and how to set it up for mobile.
+//             $mobile-threshold: 475px, // Original: 425px,
+//             $mobile-height: auto,
+//             $mobile-width: 100%,
+//             $mobile-background: none,
+//             $mobile-cols: 1,
+//             $mobile-col-repeat: 1,
+//             $mobile-rows: 1,
+//             $mobile-row-repeat: 1,
+//             $mobile-grid-area: null,
+//             $mobile-side-padding: 15px,
+//             $mobile-top-padding: 0,
+//             $mobile-bottom-padding: 0,
+//             $mobile-col-gap: 0,
+//             $mobile-row-gap: 0,
+//             $mobile-justify-items: center,
+//             $mobile-align-items: top,
+            
+//             // Where to put the threshold and how to set it up for tablets.
+//             $tablet-threshold: 768px,
+//             $tablet-height: auto,
+//             $tablet-width: 100%,
+//             $tablet-background: none,
+//             $tablet-cols: 1,
+//             $tablet-col-repeat: 1,
+//             $tablet-rows: 1,
+//             $tablet-row-repeat: 1,
+//             $tablet-grid-area: null,
+//             $tablet-side-padding: 15px,
+//             $tablet-top-padding: 0,
+//             $tablet-bottom-padding: 0,
+//             $tablet-col-gap: 0,
+//             $tablet-row-gap: 0,
+//             $tablet-justify-items: center,
+//             $tablet-align-items: top){
+    
+//     //Setup some variables that won't change for this screen size here.
+//     --height: #{$height};
+//     --width: #{$width};
+//     --bg: #{$background};
+//     justify-items: #{$justify-items};
+//     align-items: #{$align-items};
+//     --col-gap: #{$col-gap};
+//     --row-gap: #{$row-gap};
+//     --ga: #{$grid-area};
+
+    
+//     // Check to see what type of grid setup to use.
+//     // @if $cols == null && $col-repeat == 0{
+//     //     --cols: [grid-col-start] #{$side-padding} minmax(auto, 1200px)  #{$side-padding} [grid-col-end];
+//     // }@else 
+
+//     // TODO This works when using plain numbers, but does it work for others? How do I get it to work if it doesn't? Is it even possible?
+//     // This checks if a user sent a list?, otherwise it will take a number and repeat the amount of columns ask for it.
+//     @if type-of(1) != type-of($cols){
+//         // Put user manual setup of cols here
+//         --cols: [grid-col-start] #{$side-padding} #{$cols} #{$side-padding} [grid-col-end];
+//     }@else if $col-repeat > 0 {
+//         --cols:  [grid-col-start] #{$side-padding} [col-start] repeat(#{$col-repeat}, [col] 1fr) [col-end] #{$side-padding} [grid-col-end];
+//     }
+
+//     @if type-of(1) != type-of($rows){
+//         // Put user manual setup of cols here
+//         --rows: [grid-row-start] #{$rows} [grid-row-end];
+//     }@else if $row-repeat > 0 {
+//         --rows: [grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [grid-row-end];
+//     }
+
+//     // Check and setup the layout of the items, if able to.
+//     // TODO Should I put a bit of error checking here?
+//     @if $col-repeat > 0 and $row-repeat > 0{
+//         $count: 1;
+//         @for $i from 1 through $row-repeat{
+//             @for $j from 1 through $col-repeat{
+//                 --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+//                 $count: $count + 1;
+//             }
+//         }
+//     }
+    
+
+//     // Changes for the screen sizes.
+//     @media screen and (max-width: $tablet-threshold){
+        
+//         // The if statements bellow allow us to stop code from repeating itself needlessly.
+//         // @if $height != $tablet-height {
+//         //     --height: #{$tablet-height};
+//         // }
+//         // @if $width != $tablet-width {
+//         //     --width: #{$tablet-width};
+//         // }
+//         // @if $background != $tablet-background {
+//         //     --bg: #{$tablet-background};
+//         // }
+
+//         @if $justify-items != $tablet-justify-items {
+//             justify-items: #{$tablet-justify-items};
+//         }
+//         @if $align-items != $tablet-align-items {
+//             align-items: #{$tablet-align-items};
+//         }
+//         @if $col-gap != $tablet-col-gap {
+//             --col-gap: #{$tablet-col-gap};
+//         }
+//         @if $row-gap != $tablet-row-gap {
+//             --row-gap: #{$tablet-row-gap};
+//         }
+//         @if $grid-area != $tablet-grid-area {
+//             --ga: #{$tablet-grid-area};
+//         }
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1) != type-of($tablet-cols){
+//             // Put user manual setup of cols here
+//             --cols: [grid-col-start] #{$tablet-side-padding} #{$tablet-cols} #{$tablet-side-padding} [grid-col-end];
+//         }@else if $tablet-col-repeat > 0 {
+//             --cols:  [grid-col-start] #{$tablet-side-padding} [col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [col-end] #{$tablet-side-padding} [grid-col-end];
+//         }
+
+//         @if type-of(1) != type-of($tablet-rows){
+//             // Put user manual setup of cols here
+//             --rows: #{$tablet-rows};
+//         }@else if $tablet-row-repeat > 0 {
+//             --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $tablet-row-repeat{
+//                 @for $j from 1 through $tablet-col-repeat{
+//                     --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+
+//     // TODO Create a if statement to check if a threshold has been set.
+//     @media screen and (max-width: $mobile-threshold){
+//         // The bellow code may be needed later.
+//         // @if $height != $mobile-height {
+//         //     --height: #{$mobile-height};
+//         // }
+//         // @if $width != $mobile-width {
+//         //     --width: #{$mobile-width};
+//         // }
+//         // @if $background != $mobile-background {
+//         //     --bg: #{$mobile-background};
+//         // }
+
+//         @if $justify-items != $mobile-justify-items {
+//             justify-items: #{$mobile-justify-items};
+//         }
+//         @if $align-items != $mobile-align-items {
+//             align-items: #{$mobile-align-items};
+//         }
+//         @if $col-gap != $mobile-col-gap {
+//             --col-gap: #{$mobile-col-gap};
+//         }
+//         @if $row-gap != $mobile-row-gap {
+//             --row-gap: #{$mobile-row-gap};
+//         }
+//         @if $grid-area != $mobile-grid-area {
+//             --ga: #{$mobile-grid-area};
+//         }
+
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1) != type-of($mobile-cols){
+//             // Put user manual setup of cols here
+//             --cols: [grid-col-start] #{$mobile-side-padding} #{$mobile-cols} #{$mobile-side-padding} [grid-col-end];
+//         }@else if $mobile-col-repeat > 0 {
+//             --cols:  [grid-col-start] #{$mobile-side-padding} [col-start] repeat(#{$mobile-col-repeat}, [col] 1fr) [col-end] #{$mobile-side-padding} [grid-col-end];
+//         }
+
+//         @if type-of(1) != type-of($mobile-rows){
+//             // Put user manual setup of cols here
+//             --rows: #{$mobile-rows};
+//         }@else if $mobile-row-repeat > 0 {
+//             --rows: [grid-row-start] repeat(#{$mobile-row-repeat}, [row] 1fr) [grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $mobile-col-repeat > 0 and $mobile-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $mobile-row-repeat{
+//                 @for $j from 1 through $mobile-col-repeat{
+//                     --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// Sub-grid is a grid without any type of padding.
+// @mixin _sub-grid(
+//             // How to size the grid and align/justify the items.
+//             $height: auto,
+//             $width: 100%,
+//             $background: none,
+//             $justify-items: center,
+//             $align-items: top,
+            
+//             // How many columns and rows to make.
+//             $cols: 1,
+//             $col-repeat: 1,
+//             $rows: 1,
+//             $row-repeat: 1,
+//             // $items, // TODO Do I still need this?
+//             $grid-area: null,
+            
+//             // How much space to create between the sub-grid's boxes.
+//             $col-gap: 0,
+//             $row-gap: 0,
+
+//             // Where to put the threshold and how to set it up for mobile.
+//             $mobile-threshold: 475px, // Original: 425px,
+//             $mobile-height: auto,
+//             $mobile-width: 100%,
+//             $mobile-background: none,
+//             $mobile-cols: 1,
+//             $mobile-col-repeat: 1,
+//             $mobile-rows: 1,
+//             $mobile-row-repeat: 1,
+//             $mobile-grid-area: null,
+//             $mobile-col-gap: 0,
+//             $mobile-row-gap: 0,
+//             $mobile-justify-items: center,
+//             $mobile-align-items: top,
+            
+//             // Where to put the threshold and how to set it up for tablet.
+//             $tablet-threshold: 768px,
+//             $tablet-height: auto,
+//             $tablet-width: 100%,
+//             $tablet-background: none,
+//             $tablet-cols: 1,
+//             $tablet-col-repeat: 1,
+//             $tablet-rows: 1,
+//             $tablet-row-repeat: 1,
+//             $tablet-grid-area: null,
+//             $tablet-col-gap: 0,
+//             $tablet-row-gap: 0,
+//             $tablet-justify-items: center,
+//             $tablet-align-items: top){
+    
+//     //Setup some variables that won't change for this screen size here.
+//     --height: #{$height};
+//     --width: #{$width};
+//     --bg: #{$background};
+//     justify-items: #{$justify-items};
+//     align-items: #{$align-items};
+//     --col-gap: #{$col-gap};
+//     --row-gap: #{$row-gap};
+//     --ga: #{$grid-area};
+
+    
+//     // Check to see what type of grid setup to use.
+
+//     @if type-of(1) != type-of($cols){
+//         // Put user manual setup of cols here
+//         --cols: [sub-grid-col-start]  #{$cols}  [sub-grid-col-end];
+//     }@else if $col-repeat > 0 {
+//         --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
+//     }
+
+//     @if type-of(1) != type-of($rows){
+//         // Put user manual setup of cols here
+//         --rows: [sub-grid-row-start] #{$rows} [sub-grid-row-end];
+//     }@else if $row-repeat > 0 {
+//         --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [sub-grid-row-end];
+//     }
+
+//     // Check and setup the layout of the items, if able to.
+//     @if $col-repeat > 0 and $row-repeat > 0{
+//         $count: 1;
+//         @for $i from 1 through $row-repeat{
+//             @for $j from 1 through $col-repeat{
+//                 --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+//                 $count: $count + 1;
+//             }
+//         }
+//     }
+    
+
+//     // Changes for the screen sizes.
+//     @media screen and (max-width: $tablet-threshold){
+        
+//         // The if statements bellow allow us to stop code from repeating itself needlessly.
+//         @if $height != $tablet-height {
+//             --height: #{$tablet-height};
+//         }
+//         @if $width != $tablet-width {
+//             --width: #{$tablet-width};
+//         }
+//         @if $background != $tablet-background {
+//             --bg: #{$tablet-background};
+//         }
+
+//         @if $justify-items != $tablet-justify-items {
+//             justify-items: #{$tablet-justify-items};
+//         }
+//         @if $align-items != $tablet-align-items {
+//             align-items: #{$tablet-align-items};
+//         }
+//         @if $col-gap != $tablet-col-gap {
+//             --col-gap: #{$tablet-col-gap};
+//         }
+//         @if $row-gap != $tablet-row-gap {
+//             --row-gap: #{$tablet-row-gap};
+//         }
+//         @if $grid-area != $tablet-grid-area {
+//             --ga: #{$tablet-grid-area};
+//         }
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1) != type-of($tablet-cols){
+//             // Put user manual setup of cols here
+//             --cols: [sub-grid-col-start] #{$tablet-cols} [sub-grid-col-end];
+//         }@else if $tablet-col-repeat > 0 {
+//             --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
+//         }
+
+//         @if type-of(1) != type-of($tablet-rows){
+//             // Put user manual setup of cols here
+//             --rows: [sub-grid-row-start] #{$tablet-rows} [sub-grid-row-end];
+//         }@else if $tablet-row-repeat > 0 {
+//             --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [sub-grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $tablet-row-repeat{
+//                 @for $j from 1 through $tablet-col-repeat{
+//                     --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+
+//     @media screen and (max-width: $mobile-threshold){
+//         // The bellow code may be needed later.
+//         @if $height != $mobile-height {
+//             --height: #{$mobile-height};
+//         }
+//         @if $width != $mobile-width {
+//             --width: #{$mobile-width};
+//         }
+//         @if $background != $mobile-background {
+//             --bg: #{$mobile-background};
+//         }
+
+//         @if $justify-items != $mobile-justify-items {
+//             justify-items: #{$mobile-justify-items};
+//         }
+//         @if $align-items != $mobile-align-items {
+//             align-items: #{$mobile-align-items};
+//         }
+//         @if $col-gap != $mobile-col-gap {
+//             --col-gap: #{$mobile-col-gap};
+//         }
+//         @if $row-gap != $mobile-row-gap {
+//             --row-gap: #{$mobile-row-gap};
+//         }
+//         @if $grid-area != $mobile-grid-area {
+//             --ga: #{$mobile-grid-area};
+//         }
+
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1) != type-of($mobile-cols){
+//             // Put user manual setup of cols here
+//             --cols: [sub-grid-col-start] #{$mobile-cols} [sub-grid-col-end];
+//         }@else if $mobile-col-repeat > 0 {
+//             --cols:  [sub-grid-col-start] repeat(#{$mobile-col-repeat}, [col] 1fr) [sub-grid-col-end];
+//         }
+
+//         @if type-of(1) != type-of($mobile-rows){
+//             // Put user manual setup of cols here
+//             --rows: [sub-grid-row-start] #{$mobile-rows} [sub-grid-row-end];
+//         }@else if $mobile-row-repeat > 0 {
+//             --rows: [sub-grid-row-start] repeat(#{$mobile-row-repeat}, [row] 1fr) [sub-grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $mobile-col-repeat > 0 and $mobile-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $mobile-row-repeat{
+//                 @for $j from 1 through $mobile-col-repeat{
+//                     --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+// .grid{
+//     height: var(--height, auto);
+//     width: var(--width, 100%);
+//     background: var(--bg, none);
+
+//     display: grid;
+//     grid-template-columns: var(--cols, 1fr);
+//     grid-template-rows: var(--rows, 1fr);
+//     grid-column-gap: var(--col-gap, 0);
+//     grid-row-gap: var(--row-gap, 0);
+//     grid-template-areas: var(--ga, "");
+// }
+
+// // Makers for the item holders.
+// @mixin grid-item($n: 1){
+//     @for $i from 1 through $n {
+//         .grid-item-#{$i}{
+//             grid-area: var(--grid-item-#{$i});
+//             @content;
+//         }
+//     }
+// }
+
+// @mixin grid-item-area($list){
+//     @each $name in $list {
+//         .grid-item-#{$name}{
+//             grid-area: #{$name};
+//             @content;
+//         }
+//     }
+// }
+
+
+// @mixin sub-grid-item($n: 1){
+//     @for $i from 1 through $n {
+//         .sub-grid-item-#{$i}{
+//             grid-area: var(--sub-grid-item-#{$i});
+//             @content;
+//         }
+//     }
+// }
+
+// @mixin sub-grid-item-area($list){
+//     @each $name in $list {
+//         .sub-grid-item-#{$name}{
+//             grid-area: #{$name};
+//             @content;
+//         }
+//     }
+// }
+
+
+// @mixin _grid(
+//             $height: auto,
+//             $width: 100%,
+//             $background: none,
+//             $justify-items: center,
+//             $align-items: top,
+            
+//             $cols: 1,
+//             $col-repeat: 1,
+//             $rows: 1,
+//             $row-repeat: 1,
+//             // $items, // TODO Do I still need this?
+//             $grid-area: null,
+            
+//             $col-gap: 0,
+//             $row-gap: 0,
+//             $side-padding: 20px, // Original: 10%
+//             $top-padding: 0,
+//             $bottom-padding: 0,
+            
+//             $mobile-threshold: 475px, // Original: 425px,
+//             $mobile-height: auto,
+//             $mobile-width: 100%,
+//             $mobile-background: none,
+//             $mobile-cols: 1,
+//             $mobile-col-repeat: 1,
+//             $mobile-rows: 1,
+//             $mobile-row-repeat: 1,
+//             $mobile-grid-area: null,
+//             $mobile-side-padding: 15px,
+//             $mobile-top-padding: 0,
+//             $mobile-bottom-padding: 0,
+//             $mobile-col-gap: 0,
+//             $mobile-row-gap: 0,
+//             $mobile-justify-items: center,
+//             $mobile-align-items: top,
+            
+//             $tablet-threshold: 768px,
+//             $tablet-height: null,
+//             $tablet-width: 100%,
+//             $tablet-background: none,
+//             $tablet-cols: 1,
+//             $tablet-col-repeat: 1,
+//             $tablet-rows: 1,
+//             $tablet-row-repeat: 1,
+//             $tablet-grid-area: null,
+//             $tablet-side-padding: 15px,
+//             $tablet-top-padding: 0,
+//             $tablet-bottom-padding: 0,
+//             $tablet-col-gap: 0,
+//             $tablet-row-gap: 0,
+//             $tablet-justify-items: center,
+//             $tablet-align-items: top,){
+    
+//     //Setup some variables that won't change for this screen size here.
+//     --height: #{$height};
+//     --width: #{$width};
+//     --bg: #{$background};
+//     justify-items: #{$justify-items};
+//     align-items: #{$align-items};
+//     --col-gap: #{$col-gap};
+//     --row-gap: #{$row-gap};
+//     --ga: #{$grid-area};
+
+    
+//     // Check to see what type of grid setup to use.
+
+//     @if type-of(1fr 2fr) == type-of($cols){
+//         // Put user manual setup of cols here
+//         --cols: [grid-col-start] #{$side-padding} #{$cols} #{$side-padding} [grid-col-end];
+//     }@else if $col-repeat > 0 {
+//         --cols:  [grid-col-start] #{$side-padding} [col-start] repeat(#{$col-repeat}, [col] 1fr) [col-end] #{$side-padding} [grid-col-end];
+//     }
+
+//     @if type-of(1fr 2fr) == type-of($rows){
+//         // Put user manual setup of cols here
+//         --rows: #{$rows};
+//     }@else if $row-repeat > 0 {
+//         --rows: [grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [grid-row-end];
+//     }
+
+//     // Check and setup the layout of the items, if able to.
+//     @if $col-repeat > 0 and $row-repeat > 0{
+//         $count: 1;
+//         @for $i from 1 through $row-repeat{
+//             @for $j from 1 through $col-repeat{
+//                 --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+//                 $count: $count + 1;
+//             }
+//         }
+//     }
+    
+
+//     // Changes for the screen sizes.
+//     @media screen and (max-width: $tablet-threshold){
+        
+//         // The if statements bellow allow us to stop code from repeating itself needlessly.
+//         @if $tablet-height != $height{
+//             --height: #{$tablet-height};
+//         }
+//         // @if $width != $tablet-width {
+//         //     --width: #{$tablet-width};
+//         // }
+//         // @if $background != null {
+//         //     --bg: #{$tablet-background};
+//         // }
+
+//         @if $justify-items != $tablet-justify-items {
+//             justify-items: #{$tablet-justify-items};
+//         }
+//         @if $align-items != $tablet-align-items {
+//             align-items: #{$tablet-align-items};
+//         }
+//         @if $col-gap != $tablet-col-gap {
+//             --col-gap: #{$tablet-col-gap};
+//         }
+//         @if $row-gap != $tablet-row-gap {
+//             --row-gap: #{$tablet-};
+//         }
+//         @if $grid-area != $tablet-grid-area {
+//             --ga: #{$tablet-grid-area};
+//         }
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1fr 2fr) == type-of($tablet-cols){
+//             // Put user manual setup of cols here
+//             --cols: [grid-col-start] #{$tablet-side-padding} #{$tablet-cols} #{$tablet-side-padding} [grid-col-end];
+//         }@else if $tablet-col-repeat > 0 {
+//             --cols:  [grid-col-start] #{$tablet-side-padding} [col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [col-end] #{$tablet-side-padding} [grid-col-end];
+//         }
+
+//         @if type-of(1fr 2fr) == type-of($tablet-rows){
+//             // Put user manual setup of cols here
+//             --rows: #{$tablet-rows};
+//         }@else if $tablet-row-repeat > 0 {
+//             --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $tablet-row-repeat{
+//                 @for $j from 1 through $tablet-col-repeat{
+//                     --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+
+//     @media screen and (max-width: $mobile-threshold){
+//         // The bellow code may be needed later.
+//         // @if $height != $mobile-height {
+//         //     --height: #{$mobile-height};
+//         // }
+//         // @if $width != $mobile-width {
+//         //     --width: #{$mobile-width};
+//         // }
+//         // @if $background != $mobile-background {
+//         //     --bg: #{$mobile-background};
+//         // }
+
+//         @if $justify-items != $mobile-justify-items {
+//             justify-items: #{$mobile-justify-items};
+//         }
+//         @if $align-items != $mobile-align-items {
+//             align-items: #{$mobile-align-items};
+//         }
+//         @if $col-gap != $mobile-col-gap {
+//             --col-gap: #{$mobile-col-gap};
+//         }
+//         @if $row-gap != $mobile-row-gap {
+//             --row-gap: #{$mobile-};
+//         }
+//         @if $grid-area != $mobile-grid-area {
+//             --ga: #{$mobile-grid-area};
+//         }
+
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1fr 2fr) == type-of($mobile-cols){
+//             // Put user manual setup of cols here
+//             --cols: [grid-col-start] #{$mobile-side-padding} #{$mobile-cols} #{$mobile-side-padding} [grid-col-end];
+//         }@else if $mobile-col-repeat > 0 {
+//             --cols:  [grid-col-start] #{$mobile-side-padding} [col-start] repeat(#{$mobile-col-repeat}, [col] 1fr) [col-end] #{$mobile-side-padding} [grid-col-end];
+//         }
+
+//         @if type-of(1fr 2fr) == type-of($mobile-rows){
+//             // Put user manual setup of cols here
+//             --rows: #{$mobile-rows};
+//         }@else if $mobile-row-repeat > 0 {
+//             --rows: [grid-row-start] repeat(#{$mobile-row-repeat}, [row] 1fr) [grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $mobile-col-repeat > 0 and $mobile-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $mobile-row-repeat{
+//                 @for $j from 1 through $mobile-col-repeat{
+//                     --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// // Sub-grid is a grid without any type of padding.
+// @mixin _sub-grid(
+//             $height: auto,
+//             $width: 100%,
+//             $background: none,
+//             $justify-items: center,
+//             $align-items: top,
+            
+//             $cols: 1,
+//             $col-repeat: 1,
+//             $rows: 1,
+//             $row-repeat: 1,
+//             // $items, // TODO Do I still need this?
+//             $grid-area: null,
+            
+//             $col-gap: 0,
+//             $row-gap: 0,
+            
+//             $mobile-threshold: 475px, // Original: 425px,
+//             $mobile-height: auto,
+//             $mobile-width: 100%,
+//             $mobile-background: none,
+//             $mobile-cols: 1,
+//             $mobile-col-repeat: 1,
+//             $mobile-rows: 1,
+//             $mobile-row-repeat: 1,
+//             $mobile-grid-area: null,
+//             $mobile-col-gap: 0,
+//             $mobile-row-gap: 0,
+//             $mobile-justify-items: center,
+//             $mobile-align-items: top,
+            
+//             $tablet-threshold: 768px,
+//             $tablet-height: auto,
+//             $tablet-width: 100%,
+//             $tablet-background: none,
+//             $tablet-cols: 1,
+//             $tablet-col-repeat: 1,
+//             $tablet-rows: 1,
+//             $tablet-row-repeat: 1,
+//             $tablet-grid-area: null,
+//             $tablet-col-gap: 0,
+//             $tablet-row-gap: 0,
+//             $tablet-justify-items: center,
+//             $tablet-align-items: top,){
+    
+//     //Setup some variables that won't change for this screen size here.
+//     --height: #{$height};
+//     --width: #{$width};
+//     --bg: #{$background};
+//     justify-items: #{$justify-items};
+//     align-items: #{$align-items};
+//     --col-gap: #{$col-gap};
+//     --row-gap: #{$row-gap};
+//     --ga: #{$grid-area};
+
+    
+//     // Check to see what type of grid setup to use.
+
+//     @if type-of(1fr 2fr) == type-of($cols){
+//         // Put user manual setup of cols here
+//         --cols: [sub-grid-col-start]  #{$cols}  [sub-grid-col-end];
+//     }@else if $col-repeat > 0 {
+//         --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
+//     }
+
+//     @if type-of(1fr 2fr) == type-of($rows){
+//         // Put user manual setup of cols here
+//         --rows: [sub-grid-row-start] #{$rows} [sub-grid-row-end];
+//     }@else if $row-repeat > 0 {
+//         --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [sub-grid-row-end];
+//     }
+
+//     // Check and setup the layout of the items, if able to.
+//     @if $col-repeat > 0 and $row-repeat > 0{
+//         $count: 1;
+//         @for $i from 1 through $row-repeat{
+//             @for $j from 1 through $col-repeat{
+//                 --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+//                 $count: $count + 1;
+//             }
+//         }
+//     }
+    
+
+//     // Changes for the screen sizes.
+//     @media screen and (max-width: $tablet-threshold){
+        
+//         // The if statements bellow allow us to stop code from repeating itself needlessly.
+//         @if $height != $tablet-height {
+//             --height: #{$tablet-height};
+//         }
+//         @if $width != $tablet-width {
+//             --width: #{$tablet-width};
+//         }
+//         @if $background != $tablet-background {
+//             --bg: #{$tablet-background};
+//         }
+
+//         @if $justify-items != $tablet-justify-items {
+//             justify-items: #{$tablet-justify-items};
+//         }
+//         @if $align-items != $tablet-align-items {
+//             align-items: #{$tablet-align-items};
+//         }
+//         @if $col-gap != $tablet-col-gap {
+//             --col-gap: #{$tablet-col-gap};
+//         }
+//         @if $row-gap != $tablet-row-gap {
+//             --row-gap: #{$tablet-};
+//         }
+//         @if $grid-area != $tablet-grid-area {
+//             --ga: #{$tablet-grid-area};
+//         }
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1fr 2fr) == type-of($tablet-cols){
+//             // Put user manual setup of cols here
+//             --cols: [sub-grid-col-start] #{$tablet-cols} [sub-grid-col-end];
+//         }@else if $tablet-col-repeat > 0 {
+//             --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
+//         }
+
+//         @if type-of(1fr 2fr) == type-of($tablet-rows){
+//             // Put user manual setup of cols here
+//             --rows: [sub-grid-row-start] #{$tablet-rows} [sub-grid-row-end];
+//         }@else if $tablet-row-repeat > 0 {
+//             --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [sub-grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $tablet-row-repeat{
+//                 @for $j from 1 through $tablet-col-repeat{
+//                     --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+
+//     @media screen and (max-width: $mobile-threshold){
+//         // The bellow code may be needed later.
+//         @if $height != $mobile-height {
+//             --height: #{$mobile-height};
+//         }
+//         @if $width != $mobile-width {
+//             --width: #{$mobile-width};
+//         }
+//         @if $background != $mobile-background {
+//             --bg: #{$mobile-background};
+//         }
+
+//         @if $justify-items != $mobile-justify-items {
+//             justify-items: #{$mobile-justify-items};
+//         }
+//         @if $align-items != $mobile-align-items {
+//             align-items: #{$mobile-align-items};
+//         }
+//         @if $col-gap != $mobile-col-gap {
+//             --col-gap: #{$mobile-col-gap};
+//         }
+//         @if $row-gap != $mobile-row-gap {
+//             --row-gap: #{$mobile-};
+//         }
+//         @if $grid-area != $mobile-grid-area {
+//             --ga: #{$mobile-grid-area};
+//         }
+
+        
+//         // Check to see what type of grid setup to use.
+
+//         @if type-of(1fr 2fr) == type-of($mobile-cols){
+//             // Put user manual setup of cols here
+//             --cols: [sub-grid-col-start] #{$mobile-cols} [sub-grid-col-end];
+//         }@else if $mobile-col-repeat > 0 {
+//             --cols:  [sub-grid-col-start] repeat(#{$mobile-col-repeat}, [col] 1fr) [sub-grid-col-end];
+//         }
+
+//         @if type-of(1fr 2fr) == type-of($mobile-rows){
+//             // Put user manual setup of cols here
+//             --rows: [sub-grid-row-start] #{$mobile-rows} [sub-grid-row-end];
+//         }@else if $mobile-row-repeat > 0 {
+//             --rows: [sub-grid-row-start] repeat(#{$mobile-row-repeat}, [row] 1fr) [sub-grid-row-end];
+//         }
+
+//         // Check and setup the layout of the items, if able to.
+//         @if $mobile-col-repeat > 0 and $mobile-row-repeat > 0{
+//             $count: 1;
+//             @for $i from 1 through $mobile-row-repeat{
+//                 @for $j from 1 through $mobile-col-repeat{
+//                     --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+//                     $count: $count + 1;
+//                 }
+//             }
+//         }
+//     }
+// }

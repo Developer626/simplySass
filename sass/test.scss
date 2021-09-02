@@ -1,0 +1,202 @@
+// @debug type-of(45px);
+// @debug type-of($value: 45px);
+// @debug type-of(45px) == type-of(45);
+// @debug type-of("" "");
+
+@use "sass:math";
+@use "sass:color";
+@import "partials/grid";
+@import "partials/colors";
+
+// @include grid-item(4);
+
+// .test{
+//     @include _grid($col-repeat:4, $row-repeat:4, $tablet-threshold:768px);
+// }
+
+// @mixin test(
+//     $test1: 0,
+//     $test2...
+//     ){
+//         @debug $test1;
+//         @debug $test2;
+//         @debug type-of($test1);
+//         @debug type-of($test2);
+//         @debug length($test2);
+// }
+
+
+// @include test(
+//     $test1: "header header" "main main" "footer footer",
+//     //  "footer footer" "main main" "header header"
+//     );
+
+// $lists: "header header" "main main" "footer footer";
+// $area: $lists;
+// $null: null;
+// $col: 20% 3fr;
+// $row: 4fr 34px;
+
+// .test2{
+//     @include _grid($desktop-threshold: 400px, $desktop-grid-area: $lists, $tablet-threshold: 300px, $tablet-grid-area: $lists);
+// }
+
+// @debug type-of($lists);
+// @debug $lists;
+
+// $temp: null;
+
+// @each $l in $lists {
+//     $temp: $temp + "\"" + $l + "\" ";
+// }
+
+// @debug type-of($temp);
+// @debug $temp;
+
+// @debug null != $null;
+
+// .test3{
+//     @include _grid($cols: 2fr 3fr 4fr, $rows: 4fr 2fr, $tablet-threshold: 200px, $tablet-cols: 3fr 1fr 1fr 1fr, $tablet-rows: 1fr 1fr 3fr 1fr);
+// }
+
+// @debug length($col);
+
+// .test4{
+//     @include _sub-grid($cols: $col, $rows: $row, $tablet-threshold: 100px, $tablet-cols: $col, $tablet-rows: $row, $desktop-threshold: 200px, $desktop-cols: $col,
+//                     $desktop-rows:$row, $grid-area: $area, $tablet-grid-area: $area, $desktop-grid-area: $area);
+// }
+
+// @include grid-item(4){
+//     color: var(--color, white);
+// }
+
+// $holder: "1 / 2 / 1 / 2" "2/3/4/5" "2 / 5 / 1 / 7";
+// $map: ("test": "1 / 2 / 3 / 4", "name": "header", "main": "main", "row-col": "2 / 3 / 4 / 5");
+// @debug str-index($holder, "/");
+// @debug type-of($holder);
+// $test: "1 2 3 4";
+// @debug str-index($test, "/");
+
+// @include grid-item-area("header" main "footer" "1 / 2 / 1 / 2" "2/3/4/5" "2 / 5 / 1 / 7" "sidebar" "4 / 2 / 5 / 6"){
+//     color: white;
+// }
+
+// @debug "map";
+// @debug $map;
+// @debug type-of($map);
+// @debug type-of(("":""));
+// @debug type-of(());
+
+$mapData: ("top": "top", "main": "main", "footer": "footer");
+$mapData2: ("top": "1 / 2 / 3 / 4", "bottom": "bottom", "middle": " 2 / 3 / 4 / 5");
+
+// @include sub-grid-item-area($mapData){
+//     background-color: black;
+// }
+
+@include sub-grid-item-area($mapData2);
+
+// @debug $standard-tablet-threshold;
+
+// $aColor: #ffffff;
+
+// @debug blue($aColor);
+
+// @debug analogous(#aa3939);
+// @debug adjust-hue(#aa3939, 30deg);
+// @debug adjust-hue(#aa3939, -30deg);
+// @debug analogous(#aa7239);
+// @debug analogous(#aa7239, 22, 30, true, true);
+// @debug #aa7239;
+// @debug color.hue(#aa7239);
+// @debug color.saturation(#aa7239);
+// @debug color.lightness(#aa7239);
+// @debug color.red(#aa7239);
+// @debug color.green(#aa7239);
+// @debug color.blue(#aa7239);
+$prime: #aa7239;
+// @debug "+30deg";
+// $tester: adjust-hue($prime, 30deg);
+// @debug $tester;
+// @debug "";
+
+// @debug "0deg";
+// $tester: adjust-hue($tester, -30deg);
+// @debug $tester;
+// @debug "-30deg";
+// @debug adjust-hue($prime, -30deg);
+// @debug "";
+
+// // $tester: adjust-hue($tester, 30deg);
+// // @debug $tester;
+// // @debug adjust-hue($prime, 90deg);
+// // @debug "";
+
+// // $tester: adjust-hue($tester, 30deg);
+// // @debug $tester;
+// // @debug adjust-hue($prime, 120deg);
+// @debug "";
+// // @debug "";
+
+// $count: 2;
+// @debug math.ceil(math.div($count, 2)) == math.floor(math.div($count, 2));
+// @debug adjust-hue(#aa7239, 30deg);
+// // @debug adjust-hue(#aa7239, -30deg);
+// @debug adjust-hue(#aa7239, 60deg);
+// // @debug adjust-hue(#aa7239, -60deg);
+// @debug adjust-hue(#aa7239, 90deg);
+// @debug adjust-hue(#aa7239, 120deg);
+// @debug adjust-hue(#aa7239, 150deg);
+
+// @debug 1/2;
+// @debug 2/2;
+// @debug math.div(2, 3);
+
+// @debug monochrome($prime, 4, -20%, $lightness: true);
+
+// @debug color.change($prime, $lightness: 20%);
+// @debug color.change($prime, $whiteness: 20%);
+
+// @debug triadic($prime);
+// @debug triadic(#ff9700, 165deg);
+
+// $testarray: [];
+// $testarray: append($testarray, 1);
+// $testarray: append($testarray, 2);
+// $testarray: append($testarray, 3);
+// $testarray: append($testarray, 4);
+// @debug nth($testarray, 3 );
+
+// @debug tetradic($prime);
+
+// @debug analogous($prime);
+
+$palette: [];
+// $palette: append($palette, #ff0000);
+// $palette: append($palette, #dd0000);
+// $palette: append($palette, #bb0000);
+
+// @debug color-palette-mixer($palette, #faff00, 50%);
+// @debug color.mix(#faff00, #ff0000, 83.3333333333%);
+// @debug color.mix(#ff0000, #faff00, 25%);
+// @debug color.mix(#ff0000, #faff00, 33.3333333333%);
+// @debug color.mix(#ff0000, #faff00, 50%);
+// @debug color.mix(#ff0000, #faff00, 66.66%);
+// @debug color.mix(#ff0000, #faff00, 75%);
+// @debug color.mix(#faff00, #ff0000, 16.6666666667%);
+
+// @debug gradient-palette-maker(#ff0000, #faff00, 3);
+// @debug gradient-palette-maker(#ff0000, #d62cff, 3);
+// @debug gradient-palette-maker(#ff0000, #2a4858, 3); // I like the colors that are produced from this on colordesigner.io/gradient-generator (LCH Mode)
+
+// @debug monochrome($prime, 4, 20%, $saturation: true);
+// @debug monochrome($prime, 4, -20%, $saturation: true);
+@debug monochrome(#ffffff, 4, -20%, $lightness: true);
+
+.test5{
+    @include _grid($cols: 1fr 3fr, $col-repeat: 2, $rows: 2fr 3fr, $row-repeat: 2, 
+        $tablet-threshold: 100px, $tablet-cols: 1fr 3fr, $tablet-col-repeat: 2, $tablet-rows: 2fr 3fr, $tablet-row-repeat: 2, 
+        $desktop-threshold: 200px, $desktop-cols: 1fr 3fr, $desktop-col-repeat: 2, $desktop-rows: 2fr 3fr, $desktop-row-repeat: 2,);
+}
+
+@include grid-item(2);

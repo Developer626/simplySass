@@ -1,0 +1,248 @@
+@import "functions";
+
+
+@mixin root-standards ($primary-color, $color-scheme) { // $color-scheme or $color-harmony ?
+    
+    // The bellow code works, but it still needs @if to 
+    // check for the size of the list
+    :root{
+        $color-holder: colorpicker($primary-color, $color-scheme);
+        --primary-color: #{$primary-color};
+        // @debug $color-holder;
+        --secondary-color: #{nth($color-holder, 1)};
+        --tertiary-color: #{nth($color-holder, 2)};
+        --fourth-color: #{nth($color-holder, 3)};
+        --fifth-color: #{nth($color-holder, 4)};
+    }
+}
+
+
+// TODO Maybe put some sizing and media request in here too.
+@mixin standards {
+    html, body{
+        margin: 0;
+        padding: 0;
+    }
+}
+
+
+@mixin adv-standards(
+    $max-width: 800px,
+    $desktop-threshhold: 1024px,
+    $tablet-threshold: 768px,
+    $mobile-threshold: 425px) {
+
+    html, body{
+        margin: 0;
+        padding: 0;
+    }
+
+    main {
+        max-width: #{$max-width};
+        margin: 0 auto;
+    }
+
+    @media screen and (max-width: #{$tablet-threshold}){
+        main{
+            max-width: 650px;
+        }
+    }
+
+    @media screen and (max-width: #{$mobile-threshold}){
+        
+    }
+}
+
+// TODO Make this take a color setting (and maybe a few other settings) to make it more versitial.
+@mixin _link-to-btn{
+    padding: 15px;
+    background: #bd3839;//#B30000;
+    border-radius: 75px;
+    color: white;
+    font-size: 1.1em;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+// The bellow code is what should work with the bellow @mixin.
+// <header class=nav">
+//     <nav>
+//         <img class="logo"> <!-- this might need to be in a span. -->
+//         <span class="links">
+//             <a>
+//             <a>
+//         </span>
+//     </nav>
+// </header>
+
+//Bellow does not incorperate a drop down menu.
+// @mixin nav-bar(
+//     $nav-bar-height: 100px,
+//     $max-width: 1200px,
+//     $logo-height: 100%,
+//     $logo-width: 100%,
+//     $link-color: black,
+//     $link-margin: 100px,
+//     $link-padding: 10px){
+
+//     .nav{
+//         position: sticky;
+//         top:0;
+//         left:0;
+//         z-index: 3;
+
+//         nav{
+//             display: flex;
+//             justify-content: space-between;
+//             height: #{$nav-bar-height};
+//             max-width: #{$max-width};
+
+//             .logo{
+//                 align-self: center;
+//                 height: #{$logo-height};
+//                 width: #{$logo-width};
+//             }
+
+//             .links{
+//                 align-self: center;
+
+//                 a{
+//                     color: #{$link-color};
+//                     margin-right: #{$link-margin};
+//                     padding: #{$link-padding};
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// TODO Need a media query to size for different devices.
+@mixin nav-bar(
+    $nav-bar-height: 30px,
+    $max-width: 800px,
+    $logo-height: 100%,
+    $logo-width: 100%,
+    $link-color: black,
+    $link-margin: 10px,
+    $link-padding: 0 10px 0 0){
+    // TODO maybe make this have $a-margin-right, @a-margin-left
+    // Then use them like this (Ex.) => margin: #{$a-margin-right} #{a-margin-left} 0 0; 
+
+
+    
+
+    nav{
+        height: #{$nav-bar-height};
+        width: 100%; //#{$max-width};
+        position: sticky;
+        top:0;
+        left:0;
+        z-index: 3;
+        padding: 20px 0;
+
+        span{
+            max-width: #{$max-width};
+            display: flex;
+            justify-content: space-between;
+            margin: 0 auto;
+        }
+
+        .logo{
+            align-self: center;
+            height: #{$logo-height};
+            width: #{$logo-width};
+        }
+
+        a{
+            color: #{$link-color};
+            margin-right: #{$link-margin};
+            padding: #{$link-padding};
+            text-decoration: none;
+        }
+
+        ul{
+            margin: 0 10px 0 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+        }
+
+        li{
+        }
+    }
+    
+
+    @media screen and (max-width: 768px){
+        nav{
+            span{
+                max-width: 650px;
+            }
+        }
+        
+        
+    }
+}
+
+// Single level dropdown.
+@mixin nav-bar-dropdown(){
+
+    .dropdown{
+
+    }
+
+    .dropdown-btn{
+
+    }
+
+    .dropdown-content{
+        // This and the reverse is all thats 
+        // needed to make this work.
+        display: none; // *****
+    }
+
+    .dropdown-content a{
+
+    }
+
+    .dropdown-content a:hover{
+
+    }
+
+    .dropdown:hover .dropdown-content{
+        // This and the reverse is all thats 
+        // needed to make this work.
+        display: block; // *****
+    }
+}
+
+@mixin footer(
+    $max-width: 800px,
+    $mobile-threshold: 425px,
+    $tablet-threshold: 768px,
+    $desktop-threshold: 1024px){
+    footer{
+
+        width: 100%;
+
+        div{
+            max-width: #{$max-width};
+            margin: 0 auto;
+        }
+    }    
+
+    @media screen and (max-width: #{$tablet-threshold}){
+        footer{
+            div{
+                max-width: 650px;
+            }
+        }
+    }
+
+    @media screen and (max-width: #{$mobile-threshold}){
+        
+    }
+}
+
+@mixin card(){
+    
+}
