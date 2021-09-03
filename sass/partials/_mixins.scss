@@ -1,3 +1,7 @@
+// *** This whole file needs work ***
+// TODO Go through each mixin and see what can be removed.
+// TODO For Mixins that are kept, see what can be changed to make them more usefull/robust.
+
 @import "functions";
 
 
@@ -55,7 +59,7 @@
 
 // TODO Make this take a color setting (and maybe a few other settings) to make it more versitial.
 @mixin _link-to-btn{
-    padding: 15px;
+    padding: 10px 15px;
     background: #bd3839;//#B30000;
     border-radius: 75px;
     color: white;

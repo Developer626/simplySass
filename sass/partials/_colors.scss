@@ -4,12 +4,18 @@
 // ($contrast: 50% <-- in percentage) to have between the two colors, and outputs
 // a list of colors on either side of the text-color that matches the requirements
 
+// TODO Make these color functions work in different color spaces.
+// TODO Make the gradient function take more starting colors to work with. ex. (c1 <-> c2 <-> c3)
+// TODO Make a function that outputs the contrast level.
+// TODO Write better comments for each function.
+
 @use "sass:math";
 @use "sass:color";
 @use "sass:list";
 
 
 // TODO Add a comment for this function.
+// This function work on colors in the hsl/hwb color space and returns a list of colors in the rgb space.
 @function analogous(
     $primary,
     $count: 2,
@@ -105,7 +111,7 @@
 }
 
 
-// TODO Have a $one-sided variable?
+// TODO Have a $one-sided variable? This will let users recieve colors from both sides of the prime color.
 // This function takes in a primary color to work with, how many colors to produce,
 // the amount to change the next color by, and what kind of color attribute to alter.
 @function monochrome(
