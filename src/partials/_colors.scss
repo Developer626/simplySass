@@ -1,14 +1,3 @@
-// TODO Make a color checkers to help users know the if text will be visible, 
-// Maybe a function that will output two color that is visible that takes in 
-// the colors being tested ($background, $text-color), a minimum contrast level
-// ($contrast: 50% <-- in percentage) to have between the two colors, and outputs
-// a list of colors on either side of the text-color that matches the requirements
-
-// TODO Make these color functions work in different color spaces.
-// TODO Make the gradient function take more starting colors to work with. ex. (c1 <-> c2 <-> c3)
-// TODO Make a function that outputs the contrast level.
-// TODO Write better comments for each function.
-
 @use "sass:math";
 @use "sass:color";
 @use "sass:list";

@@ -1,22 +1,22 @@
-// *** This whole file needs work ***
-// TODO Go through each mixin and see what can be removed.
-// TODO For Mixins that are kept, see what can be changed to make them more usefull/robust.
-
 @import "functions";
 
 
 @mixin root-standards ($primary-color, $color-scheme) { // $color-scheme or $color-harmony ?
     
+    // TODO Add a @for loop that goes through the length in $color-holder and have @if 
+        // statements check the count of $i to output the colors with the proper names
+    // TODO Rename the css variables to better match their name/usage.
+
     // The bellow code works, but it still needs @if to 
     // check for the size of the list
     :root{
-        $color-holder: colorpicker($primary-color, $color-scheme);
+        $color-palette: colorpicker($primary-color, $color-scheme);
         --primary-color: #{$primary-color};
-        // @debug $color-holder;
-        --secondary-color: #{nth($color-holder, 1)};
-        --tertiary-color: #{nth($color-holder, 2)};
-        --fourth-color: #{nth($color-holder, 3)};
-        --fifth-color: #{nth($color-holder, 4)};
+        // @debug $color-palette;
+        --secondary-color: #{nth($color-palette, 1)};
+        --tertiary-color: #{nth($color-palette, 2)};
+        --fourth-color: #{nth($color-palette, 3)};
+        --fifth-color: #{nth($color-palette, 4)};
     }
 }
 
