@@ -190,7 +190,7 @@ $sdt: $standard-desktop-threshold;
     @if $grid-area != null {
         $temp: null;
         @each $area in $grid-area {
-            $temp: $temp + "\"" + $area + "\" ";
+            $temp: $temp + "\"." + $area + ".\" ";
         }
         $grid-area: $temp;
 
@@ -261,7 +261,7 @@ $sdt: $standard-desktop-threshold;
             @if $tablet-grid-area != null {
                 $temp: null;
                 @each $area in $tablet-grid-area {
-                    $temp: $temp + "\"" + $area + "\" ";
+                    $temp: $temp + "\"." + $area + ".\" ";
                 }
                 $tablet-grid-area: $temp;
                 --ga: #{$tablet-grid-area};
@@ -332,7 +332,7 @@ $sdt: $standard-desktop-threshold;
             @if $desktop-grid-area != null {
                 $temp: null;
                 @each $area in $desktop-grid-area {
-                    $temp: $temp + "\"" + $area + "\" ";
+                    $temp: $temp + "\"." + $area + ".\" ";
                 }
                 $desktop-grid-area: $temp;
                 --ga: #{$desktop-grid-area};
