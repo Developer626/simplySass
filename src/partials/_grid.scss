@@ -124,7 +124,7 @@ $sdt: $standard-desktop-threshold;
             $width: 100%,
             $background: none,
             $justify-items: center,
-            $align-items: top,
+            $align-items: start,
             
             // How many columns and rows to make.
             $cols: 1,
@@ -156,7 +156,7 @@ $sdt: $standard-desktop-threshold;
             $tablet-col-gap: 0,
             $tablet-row-gap: 0,
             $tablet-justify-items: center,
-            $tablet-align-items: top,
+            $tablet-align-items: start,
             
             // Where to put the threshold and how to set it up for Desktop.
             $desktop-threshold: 0,
@@ -174,7 +174,7 @@ $sdt: $standard-desktop-threshold;
             $desktop-col-gap: 0,
             $desktop-row-gap: 0,
             $desktop-justify-items: center,
-            $desktop-align-items: top){
+            $desktop-align-items: start){
     
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
@@ -384,7 +384,7 @@ $sdt: $standard-desktop-threshold;
             $width: 100%,
             $background: none,
             $justify-items: center,
-            $align-items: top,
+            $align-items: start,
             
             // How many columns and rows to make.
             $cols: 1,
@@ -410,7 +410,7 @@ $sdt: $standard-desktop-threshold;
             $tablet-col-gap: 0,
             $tablet-row-gap: 0,
             $tablet-justify-items: center,
-            $tablet-align-items: top,
+            $tablet-align-items: start,
             
             // Where to put the threshold and how to set it up for tablet.
             $desktop-threshold: 0,
@@ -425,7 +425,7 @@ $sdt: $standard-desktop-threshold;
             $desktop-col-gap: 0,
             $desktop-row-gap: 0,
             $desktop-justify-items: center,
-            $desktop-align-items: top){
+            $desktop-align-items: start){
     
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
