@@ -20,7 +20,7 @@ $sdt: $standard-desktop-threshold;
     // Add border here
 
     display: grid;
-    grid-template-columns: var(--cols, 1fr); // TODO switch 1fr to none
+    grid-template-columns: var(--cols, 1fr); // TODO switch 1fr to none?
     grid-template-rows: var(--rows, 1fr);
     grid-column-gap: var(--col-gap, 0);
     grid-row-gap: var(--row-gap, 0);

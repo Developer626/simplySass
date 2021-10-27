@@ -1,7 +1,7 @@
 // TODO Move Big TODOs here to clean up some of the code.
 
 // *********  SimplySass  ***********
-// TODO Update Readme.md and find out how to add the features that tell it's status and donations.
+// TODO Update Readme.md and find out how to add the features that tell it's status and other info at a glance.
 // TODO Get it on NPM? What other platforms can I put it on?
 // TODO Make a Document page, wiki, readme
 // TODO Find out how to make a release
