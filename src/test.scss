@@ -90,14 +90,14 @@
 // @debug type-of(("":""));
 // @debug type-of(());
 
-$mapData: ("top": "top", "main": "main", "footer": "footer");
-$mapData2: ("top": "1 / 2 / 3 / 4", "bottom": "bottom", "middle": " 2 / 3 / 4 / 5");
+// $mapData: ("top": "top", "main": "main", "footer": "footer");
+// $mapData2: ("top": "1 / 2 / 3 / 4", "bottom": "bottom", "middle": " 2 / 3 / 4 / 5");
 
 // @include sub-grid-item-area($mapData){
 //     background-color: black;
 // }
 
-@include sub-grid-item-area($mapData2);
+// @include sub-grid-item-area($mapData2);
 
 // @debug $standard-tablet-threshold;
 
@@ -194,12 +194,75 @@ $palette: [];
 
 // @debug monochrome($prime, 4, 20%, $saturation: true);
 // @debug monochrome($prime, 4, -20%, $saturation: true);
-@debug monochrome(#ffffff, 4, -20%, $lightness: true);
+// @debug monochrome(#ffffff, 4, -20%, $lightness: true);
 
-.test5{
-    @include _grid($cols: 1fr 3fr, $col-repeat: 2, $rows: 2fr 3fr, $row-repeat: 2, 
-        $tablet-threshold: 100px, $tablet-cols: 1fr 3fr, $tablet-col-repeat: 2, $tablet-rows: 2fr 3fr, $tablet-row-repeat: 2, 
-        $desktop-threshold: 200px, $desktop-cols: 1fr 3fr, $desktop-col-repeat: 2, $desktop-rows: 2fr 3fr, $desktop-row-repeat: 2,);
-}
+// .test5{
+//     @include _grid($cols: 1fr 3fr, $col-repeat: 2, $rows: 2fr 3fr, $row-repeat: 2, 
+//         $tablet-threshold: 100px, $tablet-cols: 1fr 3fr, $tablet-col-repeat: 2, $tablet-rows: 2fr 3fr, $tablet-row-repeat: 2, 
+//         $desktop-threshold: 200px, $desktop-cols: 1fr 3fr, $desktop-col-repeat: 2, $desktop-rows: 2fr 3fr, $desktop-row-repeat: 2,);
+// }
 
-@include grid-item(2);
+// @include grid-item(2);
+
+// .my-area-grid{
+//     // @include _grid($col-repeat:2, $row-repeat:2);
+//     // @include _grid($cols: 3px 10px 1fr, $rows: 4px 2px);
+//     // @include _grid($col-repeat:1, $row-repeat:8, 
+//     //     $tablet-threshold: 768px, $tablet-col-repeat: 4, $tablet-row-repeat: 2);
+//     @include _grid($grid-area: "title" "img" "text", $cols: 1fr, $row-repeat: 3,
+//             $tablet-threshold: 768px, $tablet-grid-area: "title title" "img ." "text text",
+//             $tablet-col-repeat: 2, $tablet-row-repeat: 3);
+// }
+
+// @include grid-items(4){
+//     background: red;
+//     height: 100px;
+//     width: 100px;
+// }
+
+// .my-span-grid{
+//     @include _grid($cols: 2fr 3fr, $rows: 3fr 1fr);
+// }
+
+// .item{
+//     grid-column: 1 / span 2;
+//     grid-row: 2 / 3;
+// }
+
+// .my-other-grid{
+//     @include _grid($cols: 2fr 30px 50%, $rows: 1.2rem  50vh);
+// }
+
+// .my-media-grid{
+//     @include _grid($col-repeat:1, $row-repeat:8,
+//     $tablet-threshold: 768px, $tablet-col-repeat: 2, $tablet-row-repeat: 4);
+// }
+
+// .my-grid-area{
+//     @include _grid($grid-areas: "top top" "side content" "footer footer",
+//                     $col-repeat: 2, $row-repeat:3);
+// }
+
+// @include grid-item-areas(top side content footer);
+
+// @include grid-items(4){
+//     background: orange;
+// };
+
+// .my-grid-items{
+//     @include _grid($col-repeat: 2, $row-repeat: 2);
+// }
+
+// .my-grid-items{
+//     @include grid-items(4){
+//         background: orange;
+//     }
+// }
+
+// @include grid-item-areas(top side content footer);
+// @include grid-item-areas(("nav": "top", "ad": "side", "con": "content", "foot": "footer"));
+
+// .tech-doc{
+//     @include _grid($row-repeat: 2,
+//                     $tablet-threshold: 768px, $tablet-cols: 1fr 2fr, $tablet-row-repeat: 1);
+// }

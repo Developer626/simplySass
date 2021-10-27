@@ -12,22 +12,25 @@ $stt: $standard-tablet-threshold;
 $sdt: $standard-desktop-threshold;
 
 // This gets added when _grid.scss is called.
-// This code is added to make .grid work.
+// This code is what gets _grid to work.
 .grid{
     height: var(--height, auto);
     width: var(--width, 100%);
     background: var(--bg, none);
+    // Add border here
 
     display: grid;
-    grid-template-columns: var(--cols, 1fr);
+    grid-template-columns: var(--cols, 1fr); // TODO switch 1fr to none
     grid-template-rows: var(--rows, 1fr);
     grid-column-gap: var(--col-gap, 0);
     grid-row-gap: var(--row-gap, 0);
     grid-template-areas: var(--ga, "");
+
+    // Add more grid related stuff here.
 }
 
 // Makers for the item holders.
-@mixin grid-item($n: 1){
+@mixin grid-items($n: 1){
     @for $i from 1 through $n {
         .grid-item-#{$i}{
             grid-area: var(--grid-item-#{$i});
@@ -39,11 +42,13 @@ $sdt: $standard-desktop-threshold;
 
 // It takes <name> or <row-start> / <col-start> / <row-end> / <col-end>
 // $list can be a list of <strings> or a <map>
-@mixin grid-item-area($list){
+@mixin grid-item-areas($list){
 
     // Check to see if the user sent a map or a list.
+    // TODO Test to see if this code works.
     @if type-of($list) == type-of(("":"")) {
         
+        // Creates grid areas from a map.
         @each $name, $area in $list {
             .grid-item-area-#{$name}{
                 grid-area: #{$area};
@@ -52,6 +57,7 @@ $sdt: $standard-desktop-threshold;
         }
 
     }@else {
+        // Creates a grid areas from a list.
         $count: 1;
         @each $name in $list {
 
@@ -73,7 +79,7 @@ $sdt: $standard-desktop-threshold;
 }
 
 
-@mixin sub-grid-item($n: 1){
+@mixin sub-grid-items($n: 1){
     @for $i from 1 through $n {
         .sub-grid-item-#{$i}{
             grid-area: var(--sub-grid-item-#{$i});
@@ -82,7 +88,7 @@ $sdt: $standard-desktop-threshold;
     }
 }
 
-@mixin sub-grid-item-area($list){
+@mixin sub-grid-item-areas($list){
     
     // Check to see if the user sent a map or a list.
     @if type-of($list) == type-of(("":"")) {
@@ -124,14 +130,14 @@ $sdt: $standard-desktop-threshold;
             $width: 100%,
             $background: none,
             $justify-items: center,
-            $align-items: start,
+            $align-items: center,
             
             // How many columns and rows to make.
             $cols: 1,
             $col-repeat: 1,
             $rows: 1,
             $row-repeat: 1,
-            $grid-area: null,
+            $grid-areas: null,
             
             // How to pad the grid inside and out.
             $col-gap: 0,
@@ -149,14 +155,14 @@ $sdt: $standard-desktop-threshold;
             $tablet-col-repeat: 1,
             $tablet-rows: 1,
             $tablet-row-repeat: 1,
-            $tablet-grid-area: null,
+            $tablet-grid-areas: null,
             $tablet-side-padding: 15px,
             $tablet-top-padding: 0,
             $tablet-bottom-padding: 0,
             $tablet-col-gap: 0,
             $tablet-row-gap: 0,
             $tablet-justify-items: center,
-            $tablet-align-items: start,
+            $tablet-align-items: center,
             
             // Where to put the threshold and how to set it up for Desktop.
             $desktop-threshold: 0,
@@ -167,14 +173,14 @@ $sdt: $standard-desktop-threshold;
             $desktop-col-repeat: 1,
             $desktop-rows: 1,
             $desktop-row-repeat: 1,
-            $desktop-grid-area: null,
+            $desktop-grid-areas: null,
             $desktop-side-padding: 15px,
             $desktop-top-padding: 0,
             $desktop-bottom-padding: 0,
             $desktop-col-gap: 0,
             $desktop-row-gap: 0,
             $desktop-justify-items: center,
-            $desktop-align-items: start){
+            $desktop-align-items: center){
     
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
@@ -182,19 +188,19 @@ $sdt: $standard-desktop-threshold;
     --bg: #{$background};
     justify-items: #{$justify-items};  // TODO Should I write this code into the .grid like the others in this code section?
     align-items: #{$align-items};
-    --col-gap: #{$col-gap};
+    --col-gap: #{$col-gap};  // TODO If .grid handles this when it's 0, should I have the code remove it? What if it's set somewhere else and someone wants it to be set to 0 then?
     --row-gap: #{$row-gap};
 
-    // Making $grid-area a string, with quotes.
+    // Making $grid-areas a string, with quotes.
     // This will allow this mixin to take in a list and properly output it in CSS.
-    @if $grid-area != null {
+    @if $grid-areas != null {
         $temp: null;
-        @each $area in $grid-area {
-            $temp: $temp + "\"." + $area + ".\" ";
+        @each $area in $grid-areas {
+            $temp: $temp + "\". " + $area + " .\" ";
         }
-        $grid-area: $temp;
+        $grid-areas: $temp;
 
-        --ga: #{$grid-area}; 
+        --ga: #{$grid-areas}; // TODO switch this to grid-areas
     }
     
 
@@ -258,13 +264,13 @@ $sdt: $standard-desktop-threshold;
             @if $row-gap != $tablet-row-gap {
                 --row-gap: #{$tablet-row-gap};
             }
-            @if $tablet-grid-area != null {
+            @if $tablet-grid-areas != null {
                 $temp: null;
-                @each $area in $tablet-grid-area {
-                    $temp: $temp + "\"." + $area + ".\" ";
+                @each $area in $tablet-grid-areas {
+                    $temp: $temp + "\". " + $area + " .\" ";
                 }
-                $tablet-grid-area: $temp;
-                --ga: #{$tablet-grid-area};
+                $tablet-grid-areas: $temp;
+                --ga: #{$tablet-grid-areas};
             }
             
     
@@ -329,13 +335,13 @@ $sdt: $standard-desktop-threshold;
             @if $row-gap != $desktop-row-gap {
                 --row-gap: #{$desktop-row-gap};
             }
-            @if $desktop-grid-area != null {
+            @if $desktop-grid-areas != null {
                 $temp: null;
-                @each $area in $desktop-grid-area {
-                    $temp: $temp + "\"." + $area + ".\" ";
+                @each $area in $desktop-grid-areas {
+                    $temp: $temp + "\". " + $area + " .\" ";
                 }
-                $desktop-grid-area: $temp;
-                --ga: #{$desktop-grid-area};
+                $desktop-grid-areas: $temp;
+                --ga: #{$desktop-grid-areas};
             }
     
             
@@ -384,14 +390,14 @@ $sdt: $standard-desktop-threshold;
             $width: 100%,
             $background: none,
             $justify-items: center,
-            $align-items: start,
+            $align-items: center,
             
             // How many columns and rows to make.
             $cols: 1,
             $col-repeat: 1,
             $rows: 1,
             $row-repeat: 1,
-            $grid-area: null,
+            $grid-areas: null,
             
             // How much space to create between the sub-grid's boxes.
             $col-gap: 0,
@@ -406,11 +412,11 @@ $sdt: $standard-desktop-threshold;
             $tablet-col-repeat: 1,
             $tablet-rows: 1,
             $tablet-row-repeat: 1,
-            $tablet-grid-area: null,
+            $tablet-grid-areas: null,
             $tablet-col-gap: 0,
             $tablet-row-gap: 0,
             $tablet-justify-items: center,
-            $tablet-align-items: start,
+            $tablet-align-items: center,
             
             // Where to put the threshold and how to set it up for tablet.
             $desktop-threshold: 0,
@@ -421,11 +427,11 @@ $sdt: $standard-desktop-threshold;
             $desktop-col-repeat: 1,
             $desktop-rows: 1,
             $desktop-row-repeat: 1,
-            $desktop-grid-area: null,
+            $desktop-grid-areas: null,
             $desktop-col-gap: 0,
             $desktop-row-gap: 0,
             $desktop-justify-items: center,
-            $desktop-align-items: start){
+            $desktop-align-items: center){
     
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
@@ -437,16 +443,16 @@ $sdt: $standard-desktop-threshold;
     --row-gap: #{$row-gap};
     
 
-    // Making $grid-area a string, with quotes.
+    // Making $grid-areas a string, with quotes.
     // This will format a list of strings so the CSS code will recognise it.
-    @if $grid-area != null {
+    @if $grid-areas != null {
         $temp: null;
-        @each $area in $grid-area {
+        @each $area in $grid-areas {
             $temp: $temp + "\"" + $area + "\" ";
         }
-        $grid-area: $temp;
+        $grid-areas: $temp;
 
-        --ga: #{$grid-area}; 
+        --ga: #{$grid-areas}; 
     }
 
     
@@ -511,13 +517,13 @@ $sdt: $standard-desktop-threshold;
             @if $row-gap != $tablet-row-gap {
                 --row-gap: #{$tablet-row-gap};
             }
-            @if $tablet-grid-area != null {
+            @if $tablet-grid-areas != null {
                 $temp: null;
-                @each $area in $tablet-grid-area {
+                @each $area in $tablet-grid-areas {
                     $temp: $temp + "\"" + $area + "\" ";
                 }
-                $tablet-grid-area: $temp;
-                --ga: #{$tablet-grid-area};
+                $tablet-grid-areas: $temp;
+                --ga: #{$tablet-grid-areas};
             }
             
 
@@ -580,13 +586,13 @@ $sdt: $standard-desktop-threshold;
             @if $row-gap != $desktop-row-gap {
                 --row-gap: #{$desktop-row-gap};
             }
-            @if $desktop-grid-area != null {
+            @if $desktop-grid-areas != null {
                 $temp: null;
-                @each $area in $desktop-grid-area {
+                @each $area in $desktop-grid-areas {
                     $temp: $temp + "\"" + $area + "\" ";
                 }
-                $desktop-grid-area: $temp;
-                --ga: #{$desktop-grid-area};
+                $desktop-grid-areas: $temp;
+                --ga: #{$desktop-grid-areas};
             }
     
             
