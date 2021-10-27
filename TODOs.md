@@ -1,5 +1,3 @@
-# Plan
-
 # General TODOs
 - [ ] Refactor TODO List
 - [ ] Move Big TODOs here to clean up some of the code.
@@ -10,7 +8,7 @@
 - [ ] Like gridlex (which I think has the code moved into different functions) have media request code moved/made all in one spot.
 - [ ] Add more info to the README.md
 - [X] (Done, for now) TODO Write a better README.md
-- [ ] Update Readme.md and find out how to add the features that tell it's status and other info at a glance.
+- [ ] Update README.md and find out how to add the features that tell it's status and other info at a glance.
 - [X] Create a feature list to list out wanted ones
 - [ ] Update Feature List
 - [X] Rewrite this list as a markdown
@@ -18,6 +16,7 @@
 - [X] Design and create a Logo for this project.
 - [ ] Make a way for the code to output some fallback code (@supports()) when using more newer css code.
 - [ ] A minified version of the project.
+- [ ] Update FEATURES.md (Add to "Wanted Features" and "Current Featrues")
 
 
 
