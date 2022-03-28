@@ -52,8 +52,8 @@
 
 
 # _grid TODOs
-- [ ] Future idea, Make the .grid-item* take a chosen name from the user so they have more control?
-- [ ] Based on the idea above, have the grid-item do it all. 
+- [ ] Future idea, make the .grid-items take a modifier to add a name from the user so they have more unique names?
+- [X] Based on the idea above, have the grid-item do it all. 
     * Have it check for the type `<number>`, `<list>`, and `<map>` then respon accordingly.
 - [ ] Add place-items to the _grid/_sub-grid code (replaces justify/align-items?)
 - [ ] Add new CSS code to _grid() 
@@ -86,13 +86,25 @@
     * Based on some of the ways the methods/functions/features that I want in _grid, they will most likely have to be
       added to _sub-grid(). This is do to the padding that is involved in _grid() which messes up how things fall into
       place. I will still need to test out all of the features I wish to add, it may be possible to add some of them.
-- [X] Add an S to the end of grid-item and grid-area
-- [ ] Can I make _grid create --grid-items that are --grid-area? Would that be benificial?
+- [X] Add an "s" to the end of grid-item and grid-area
+- [X] Can I make _grid create --grid-items that are --grid-area? Would that be benificial? I think that I've already done this.
 - [ ] Make a variable for grid-items that can hold a prefix to name the class, if none then name it grid-item-#
 - [ ] Add better documentation to _grid partials
 - [ ] See about combining sub-grid and grid mixins to shorten code
 - [ ] Try and see if auto-fill and auto-fit will work like I tried before. (_sub-grid?)
-
+- [ ] When making non repeating cols and rows make the code not use the CSS repeat() (Makes it more custom) (for tablet/desktop too)  
+- [ ] Have the code check whether or not to auto create grid item variables in _grid/_sub-grid (Using a passed variable) (auto-items)  
+- [ ] Have the ability to pass custom grid item variables to _grid/_sub-grid (in a passed variable) (custom-items)  
+    * Do I need to have $auto-items if I can check if $custom-items is not null?  
+    * What if I create a separate function to make --grid-items inside a class instead?  
+- [ ] Have _grid/_sub-grid take a map as well as a list to handle custom lists  
+- [ ] Have the $auto-items switch the direction how they're created? (Along the X-axis or Y-axis first)  
+- [X] Have grid-items/sub-grid-items also take in a <map> to create custom grid areas with the 1/1/1/1 system  
+    * (possible?) (Already done in grid-item-areas?) (Yep, I already created this)  
+- [ ] Shorten names to make creating layouts faster.  
+- [ ] Remove grid-item-areas since grid-items now covers it all.  
+- [ ] Make _sub-grid-items not use names and use exclusively numbers?  
+- [ ] Maybe try converting some of _grid/_sub-grid code to use function like parts to reuse and simplify code.
 
 
 # _mixins  TODOs

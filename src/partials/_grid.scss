@@ -1,3 +1,8 @@
+// TODOs
+// >-Make non repeating cols and rows not use the CSS repeat() code
+// -Have the code check whether or not to auto create grid item variables in _grid/_sub-grid
+// -Have the ability to pass custom grid item variables to _grid/_sub-grid
+// >-Have grid-items/sub-grid-items also take in a <map> to create custom grid areas with the 1/1/1/1 system (possible?)(Already done in grid-item-areas?)(Yep, I already created this)
 @use "sass:list";
 @use "sass:string";
 
@@ -29,12 +34,55 @@ $sdt: $standard-desktop-threshold;
     // Add more grid related stuff here.
 }
 
-// Makers for the item holders.
-@mixin grid-items($n: 1){
-    @for $i from 1 through $n {
-        .grid-item-#{$i}{
-            grid-area: var(--grid-item-#{$i});
-            @content;
+// Maker for the item holders.
+// @mixin grid-items($n: 1){
+//     @for $i from 1 through $n {
+//         .grid-item-#{$i}{
+//             grid-area: var(--grid-item-#{$i});
+//             @content;
+//         }
+//     }
+// }
+
+@mixin grid-items($items: 1, $modifier: null){
+    
+    @if type-of($items) == type-of(1){
+        // Creates items from a number count
+        @for $i from 1 through $items {
+            .grid-item-#{$i}{
+                grid-area: var(--grid-item-#{$i});
+                @content;
+            }
+        }
+    }@else if type-of($items) == type-of(("":"")) {
+        
+        // Creates grid areas from a map.
+        @each $name, $area in $items {
+            .grid-item-#{$name}{
+                grid-area: #{$area};
+                @content;
+            }
+        }
+
+    }@else {
+        // Creates a grid areas from a list.
+        $count: 1;
+        @each $name in $items {
+
+            // TODO Should this create a class name with $name in it? That seems to make it less reusable.
+            @if string.index($name, "/") == null{
+                .grid-item-#{$name}{
+                    grid-area: #{$name};
+                    @content;
+                }
+            }@else {
+                .grid-item-#{$count}{
+                    grid-area: #{$name};
+                    @content;
+                }
+
+                $count: $count + 1;
+            }
         }
     }
 }
@@ -50,7 +98,7 @@ $sdt: $standard-desktop-threshold;
         
         // Creates grid areas from a map.
         @each $name, $area in $list {
-            .grid-item-area-#{$name}{
+            .grid-item-#{$name}{
                 grid-area: #{$area};
                 @content;
             }
@@ -62,12 +110,12 @@ $sdt: $standard-desktop-threshold;
         @each $name in $list {
 
             @if string.index($name, "/") == null{
-                .grid-item-area-#{$name}{
+                .grid-item-#{$name}{
                     grid-area: #{$name};
                     @content;
                 }
             }@else {
-                .grid-item-area-#{$count}{
+                .grid-item-#{$count}{
                     grid-area: #{$name};
                     @content;
                 }
@@ -94,7 +142,7 @@ $sdt: $standard-desktop-threshold;
     @if type-of($list) == type-of(("":"")) {
         
         @each $name, $area in $list {
-            .sub-grid-item-area-#{$name}{
+            .sub-grid-item-#{$name}{
                 grid-area: #{$area};
                 @content;
             }
@@ -106,12 +154,12 @@ $sdt: $standard-desktop-threshold;
         @each $name in $list {
 
             @if string.index($name, "/") == null{
-                .sub-grid-item-area-#{$name}{
+                .sub-grid-item-#{$name}{
                     grid-area: #{$name};
                     @content;
                 }
             }@else {
-                .sub-grid-item-area-#{$count}{
+                .sub-grid-item-#{$count}{
                     grid-area: #{$name};
                     @content;
                 }
@@ -145,6 +193,10 @@ $sdt: $standard-desktop-threshold;
             $side-padding: 20px, // Original: 10%
             $top-padding: 0,
             $bottom-padding: 0,
+
+            // Whether or not to create custom item variables
+            $auto-items: true,
+            $custom-items: null,
             
             // Where to put the threshold and how to set it up for Tablet.
             $tablet-threshold: 0,
@@ -163,6 +215,8 @@ $sdt: $standard-desktop-threshold;
             $tablet-row-gap: 0,
             $tablet-justify-items: center,
             $tablet-align-items: center,
+            $tablet-auto-items: false,
+            $tablet-custom-items: null,
             
             // Where to put the threshold and how to set it up for Desktop.
             $desktop-threshold: 0,
@@ -180,7 +234,9 @@ $sdt: $standard-desktop-threshold;
             $desktop-col-gap: 0,
             $desktop-row-gap: 0,
             $desktop-justify-items: center,
-            $desktop-align-items: center){
+            $desktop-align-items: center,
+            $desktop-auto-items: false,
+            $desktop-custom-items: null){
     
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
@@ -203,8 +259,14 @@ $sdt: $standard-desktop-threshold;
         --ga: #{$grid-areas}; // TODO switch this to grid-areas
     }
     
+    @if type-of(1) != type-of($cols) and $col-repeat == 1{
+        
+        // Put user manual setup of cols here
+        --cols: [grid-col-start] #{$side-padding} #{$cols} #{$side-padding} [grid-col-end];
 
-    @if type-of(1) != type-of($cols){
+        $col-repeat: list.length($cols) * $col-repeat;
+
+    }@else if type-of(1) != type-of($cols){
         
         // Put user manual setup of cols here
         --cols: [grid-col-start] #{$side-padding} repeat(#{$col-repeat}, #{$cols}) #{$side-padding} [grid-col-end];
@@ -215,7 +277,13 @@ $sdt: $standard-desktop-threshold;
         --cols:  [grid-col-start] #{$side-padding} [col-start] repeat(#{$col-repeat}, [col] 1fr) [col-end] #{$side-padding} [grid-col-end];
     }
 
-    @if type-of(1) != type-of($rows){
+    @if type-of(1) != type-of($rows) and $row-repeat == 1{
+        // Put user manual setup of cols here
+        --rows: [grid-row-start] #{$rows} [grid-row-end];
+
+        $row-repeat: list.length($rows);
+
+    }@else if type-of(1) != type-of($rows){
         // Put user manual setup of cols here
         --rows: [grid-row-start] repeat(#{$row-repeat}, #{$rows}) [grid-row-end];
 
@@ -226,12 +294,40 @@ $sdt: $standard-desktop-threshold;
     }
 
      
-    @if $col-repeat > 0 and $row-repeat > 0{
+    @if $col-repeat > 0 and $row-repeat > 0 and $auto-items{
         $count: 1;
         @for $i from 1 through $row-repeat{
             @for $j from 1 through $col-repeat{
                 --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
                 $count: $count + 1;
+            }
+        }
+    }@else if $custom-items != null and $auto-items == false{
+        
+        @if type-of($custom-items) == type-of(1){
+            // Type is number
+            // Not sure how useful this one will be.
+            $count: 1;
+            @for $i from 1 through $custom-items {
+                --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+                $count: $count + 1;
+            }
+        }@else if type-of($custom-items) == type-of(("":"")){
+            // Type is map
+            @each $name, $area in $custom-items {
+                --grid-item-#{$name}: #{$area};
+            }
+
+        }@else {
+            // Type then is a List
+            $count: 1;
+            @each $name in $custom-items {
+                @if string.index($name, "/") == null {
+                    --grid-item-#{$name}: #{$name};
+                }@else {
+                    --grid-item-#{$count}: #{$name};
+                    $count: $count + 1;
+                }
             }
         }
     }
@@ -275,7 +371,13 @@ $sdt: $standard-desktop-threshold;
             
     
             // Check to see what type of grid setup to use.
-            @if type-of(1) != type-of($tablet-cols){
+            @if type-of(1) != type-of($tablet-cols) and $tablet-col-repeat == 1{
+                // Put user manual setup of cols here
+                --cols: [grid-col-start] #{$tablet-side-padding} #{$tablet-cols} #{$tablet-side-padding} [grid-col-end];
+
+                $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+        
+            }@else if type-of(1) != type-of($tablet-cols){
                 // Put user manual setup of cols here
                 --cols: [grid-col-start] #{$tablet-side-padding} repeat(#{$tablet-col-repeat}, #{$tablet-cols}) #{$tablet-side-padding} [grid-col-end];
 
@@ -285,7 +387,13 @@ $sdt: $standard-desktop-threshold;
                 --cols:  [grid-col-start] #{$tablet-side-padding} [col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [col-end] #{$tablet-side-padding} [grid-col-end];
             }
     
-            @if type-of(1) != type-of($tablet-rows){
+            @if type-of(1) != type-of($tablet-rows) and $tablet-row-repeat == 1{
+                // Put user manual setup of cols here
+                --rows: [grid-row-start] #{$tablet-rows} [grid-row-end];
+
+                $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
+        
+            }@else if type-of(1) != type-of($tablet-rows){
                 // Put user manual setup of cols here
                 --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [grid-row-end];
 
@@ -296,12 +404,40 @@ $sdt: $standard-desktop-threshold;
             }
     
             // Check and setup the layout of the items, if able to.
-            @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+            @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0 and $tablet-auto-items{
                 $count: 1;
                 @for $i from 1 through $tablet-row-repeat{
                     @for $j from 1 through $tablet-col-repeat{
                         --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
                         $count: $count + 1;
+                    }
+                }
+            }@else if $tablet-custom-items != null and $tablet-auto-items == false{
+        
+                @if type-of($tablet-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $tablet-custom-items {
+                        --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($tablet-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $tablet-custom-items {
+                        --grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $tablet-custom-items {
+                        @if string.index($name, "/") == null {
+                            --grid-item-#{$name}: #{$name};
+                        }@else {
+                            --grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
                     }
                 }
             }
@@ -347,7 +483,13 @@ $sdt: $standard-desktop-threshold;
             
 
             // Check to see what type of grid setup to use.
-            @if type-of(1) != type-of($desktop-cols){
+            @if type-of(1) != type-of($desktop-cols) and $desktop-col-repeat == 1{
+                // Put user manual setup of cols here
+                --cols: [grid-col-start] #{$desktop-side-padding} #{$desktop-cols} #{$desktop-side-padding} [grid-col-end];
+
+                $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
+        
+            }@else if type-of(1) != type-of($desktop-cols){
                 // Put user manual setup of cols here
                 --cols: [grid-col-start] #{$desktop-side-padding} repeat(#{$desktop-col-repeat}, #{$desktop-cols}) #{$desktop-side-padding} [grid-col-end];
 
@@ -357,7 +499,13 @@ $sdt: $standard-desktop-threshold;
                 --cols:  [grid-col-start] #{$desktop-side-padding} [col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [col-end] #{$desktop-side-padding} [grid-col-end];
             }
     
-            @if type-of(1) != type-of($desktop-rows){
+            @if type-of(1) != type-of($desktop-rows) and $desktop-row-repeat == 1{
+                // Put user manual setup of cols here
+                --rows: [grid-row-start] #{$desktop-rows} [grid-row-end];
+
+                $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
+        
+            }@else if type-of(1) != type-of($desktop-rows){
                 // Put user manual setup of cols here
                 --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [grid-row-end];
 
@@ -368,7 +516,7 @@ $sdt: $standard-desktop-threshold;
             }
     
             // Check and setup the layout of the items, if able to.
-            @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0{
+            @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0 and $desktop-auto-items{
                 $count: 1;
                 @for $i from 1 through $desktop-row-repeat{
                     @for $j from 1 through $desktop-col-repeat{
@@ -376,10 +524,37 @@ $sdt: $standard-desktop-threshold;
                         $count: $count + 1;
                     }
                 }
+            }@else if $desktop-custom-items != null and $desktop-auto-items == false{
+        
+                @if type-of($desktop-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $desktop-custom-items {
+                        --grid-item-#{$count}: #{$i} / #{1 + $j} / #{1 + $i} / #{2 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($desktop-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $desktop-custom-items {
+                        --grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $desktop-custom-items {
+                        @if string.index($name, "/") == null {
+                            --grid-item-#{$name}: #{$name};
+                        }@else {
+                            --grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
+                    }
+                }
             }
         }
     }
-    
 }
 
 
@@ -403,6 +578,10 @@ $sdt: $standard-desktop-threshold;
             $col-gap: 0,
             $row-gap: 0,
 
+            // Whether or not to create custom item variables
+            $auto-items: true,
+            $custom-items: null,
+
             // Where to put the threshold and how to set it up for mobile.
             $tablet-threshold: 0, // Original: 425px,
             $tablet-height: auto,
@@ -417,6 +596,8 @@ $sdt: $standard-desktop-threshold;
             $tablet-row-gap: 0,
             $tablet-justify-items: center,
             $tablet-align-items: center,
+            $tablet-auto-items: false,
+            $tablet-custom-items: null,
             
             // Where to put the threshold and how to set it up for tablet.
             $desktop-threshold: 0,
@@ -431,7 +612,9 @@ $sdt: $standard-desktop-threshold;
             $desktop-col-gap: 0,
             $desktop-row-gap: 0,
             $desktop-justify-items: center,
-            $desktop-align-items: center){
+            $desktop-align-items: center,
+            $desktop-auto-items: false,
+            $desktop-custom-items: null){
     
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
@@ -458,17 +641,31 @@ $sdt: $standard-desktop-threshold;
     
 
     // Check to see what type of grid setup to use.
-    @if type-of(1) != type-of($cols){
+    @if type-of(1) != type-of($cols) and $col-repeat == 1{
+        // Put user manual setup of cols here
+        --cols: [sub-grid-col-start]  #{$cols}  [sub-grid-col-end];
+
+        $col-repeat: list.length($cols) * $col-repeat;
+    }@else if type-of(1) != type-of($cols){
         // Put user manual setup of cols here
         --cols: [sub-grid-col-start]  repeat(#{$col-repeat}, #{$cols})  [sub-grid-col-end];
 
         $col-repeat: list.length($cols) * $col-repeat;
-
     }@else if $col-repeat > 0 {
         --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
     }
 
-    @if type-of(1) != type-of($rows){
+    // TODO Using repeat seems to mess with the expected outcome. I recommend to add another if statement to check for $col-repeat > 1
+    //      and not have repeat used when it does equal to 1.
+    // So, what was messing with the code was using a repeat inside of a repeat. Though that said, it might be better to make the 
+    // CSS code that this code spits out to not use a repeat 1.
+    @if type-of(1) != type-of($rows) and $row-repeat == 1{
+        // Put user manual setup of cols here
+        --rows: [sub-grid-row-start] #{$rows} [sub-grid-row-end];
+
+        $row-repeat: list.length($rows);
+
+    }@else if type-of(1) != type-of($rows){
         // Put user manual setup of cols here
         --rows: [sub-grid-row-start] repeat(#{$row-repeat}, #{$rows}) [sub-grid-row-end];
 
@@ -479,7 +676,7 @@ $sdt: $standard-desktop-threshold;
     }
 
     // Check and setup the layout of the items, if able to.
-    @if $col-repeat > 0 and $row-repeat > 0{
+    @if $col-repeat > 0 and $row-repeat > 0 and $auto-items{
         $count: 1;
         @for $i from 1 through $row-repeat{
             @for $j from 1 through $col-repeat{
@@ -487,7 +684,45 @@ $sdt: $standard-desktop-threshold;
                 $count: $count + 1;
             }
         }
+
+    // TODO What if I have a choice to send a map instead of a list?
+    }@else if $custom-items != null and $auto-items == false{
+        
+        @if type-of($custom-items) == type-of(1){
+            // Type is number
+            // Not sure how useful this one will be.
+            $count: 1;
+            @for $i from 1 through $custom-items {
+                --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                $count: $count + 1;
+            }
+        }@else if type-of($custom-items) == type-of(("":"")){
+            // Type is map
+            @each $name, $area in $custom-items {
+                --sub-grid-item-#{$name}: #{$area};
+            }
+
+        }@else {
+            // Type then is a List
+            $count: 1;
+            @each $name in $custom-items {
+                @if string.index($name, "/") == null {
+                    --sub-grid-item-#{$name}: #{$name};
+                }@else {
+                    --sub-grid-item-#{$count}: #{$name};
+                    $count: $count + 1;
+                }
+            }
+        }
+        
+        // $count: 1;
+        // @each $item in $custom-items {
+        //     --sub-grid-item-#{$count}: #{$item};
+        //     $count: $count + 1;
+        // }
     }
+
+    
     
 
     // Changes for the screen sizes.
@@ -528,7 +763,13 @@ $sdt: $standard-desktop-threshold;
             
 
             // Check to see what type of grid setup to use.
-            @if type-of(1) != type-of($tablet-cols){
+            @if type-of(1) != type-of($tablet-cols) and $tablet-col-repeat == 1{
+                // Put user manual setup of cols here
+                --cols: [sub-grid-col-start] #{$tablet-cols} [sub-grid-col-end];
+
+                $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+        
+            }@else if type-of(1) != type-of($tablet-cols){
                 // Put user manual setup of cols here
                 --cols: [sub-grid-col-start] repeat(#{$tablet-col-repeat}, #{$tablet-cols}) [sub-grid-col-end];
 
@@ -537,8 +778,14 @@ $sdt: $standard-desktop-threshold;
             }@else if $tablet-col-repeat > 0 {
                 --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
             }
-    
-            @if type-of(1) != type-of($tablet-rows){
+            
+            @if type-of(1) != type-of($tablet-rows) and $tablet-row-repeat == 1{
+                // Put user manual setup of cols here
+                --rows: [sub-grid-row-start] #{$tablet-rows} [sub-grid-row-end];
+
+                $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
+        
+            }@else if type-of(1) != type-of($tablet-rows){
                 // Put user manual setup of cols here
                 --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [sub-grid-row-end];
 
@@ -549,12 +796,40 @@ $sdt: $standard-desktop-threshold;
             }
     
             // Check and setup the layout of the items, if able to.
-            @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0{
+            @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0 and $tablet-auto-items{
                 $count: 1;
                 @for $i from 1 through $tablet-row-repeat{
                     @for $j from 1 through $tablet-col-repeat{
                         --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
                         $count: $count + 1;
+                    }
+                }
+            }@else if $tablet-custom-items != null and $tablet-auto-items == false{
+        
+                @if type-of($tablet-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $tablet-custom-items {
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($tablet-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $tablet-custom-items {
+                        --sub-grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $tablet-custom-items {
+                        @if string.index($name, "/") == null {
+                            --sub-grid-item-#{$name}: #{$name};
+                        }@else {
+                            --sub-grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
                     }
                 }
             }
@@ -598,7 +873,13 @@ $sdt: $standard-desktop-threshold;
             
 
             // Check to see what type of grid setup to use.
-            @if type-of(1) != type-of($desktop-cols){
+            @if type-of(1) != type-of($desktop-cols) and $desktop-col-repeat == 1{
+                // Put user manual setup of cols here
+                --cols: [sub-grid-col-start] #{$desktop-cols} [sub-grid-col-end];
+
+                $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
+        
+            }@else if type-of(1) != type-of($desktop-cols){
                 // Put user manual setup of cols here
                 --cols: [sub-grid-col-start] repeat(#{$desktop-col-repeat}, #{$desktop-cols}) [sub-grid-col-end];
 
@@ -608,7 +889,13 @@ $sdt: $standard-desktop-threshold;
                 --cols:  [sub-grid-col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [sub-grid-col-end];
             }
     
-            @if type-of(1) != type-of($desktop-rows){
+            @if type-of(1) != type-of($desktop-rows) and $desktop-row-repeat == 1{
+                // Put user manual setup of cols here
+                --rows: [sub-grid-row-start] #{$desktop-rows} [sub-grid-row-end];
+
+                $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
+        
+            }@else if type-of(1) != type-of($desktop-rows){
                 // Put user manual setup of cols here
                 --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [sub-grid-row-end];
 
@@ -619,12 +906,40 @@ $sdt: $standard-desktop-threshold;
             }
     
             // Check and setup the layout of the items, if able to.
-            @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0{
+            @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0 and $desktop-auto-items{
                 $count: 1;
                 @for $i from 1 through $desktop-row-repeat{
                     @for $j from 1 through $desktop-col-repeat{
                         --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
                         $count: $count + 1;
+                    }
+                }
+            }@else if $desktop-custom-items != null and $desktop-auto-items == false{
+        
+                @if type-of($desktop-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $desktop-custom-items {
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($desktop-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $desktop-custom-items {
+                        --sub-grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $desktop-custom-items {
+                        @if string.index($name, "/") == null {
+                            --sub-grid-item-#{$name}: #{$name};
+                        }@else {
+                            --sub-grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
                     }
                 }
             }
