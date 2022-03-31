@@ -109,6 +109,7 @@
 - [ ] Add some error checking and messages to the output of the code. (if possible)  
 - [ ] Make sub-grid-items copy grid-itmes if not removing it.    
 - [ ] When grid-items start to use modifiers for the name, _grid/_sub-grid will need to have a modifier to possibly  
+- [ ] Make grid-items use more variables to create more custom classes?  
 
 # _mixins  TODOs
 - [X] This file is broken. It calls functions that have been moved and don't exist anymore. Fix it.
