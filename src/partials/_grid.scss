@@ -1,11 +1,6 @@
-// TODOs
-// >-Make non repeating cols and rows not use the CSS repeat() code
-// -Have the code check whether or not to auto create grid item variables in _grid/_sub-grid
-// -Have the ability to pass custom grid item variables to _grid/_sub-grid
-// >-Have grid-items/sub-grid-items also take in a <map> to create custom grid areas with the 1/1/1/1 system (possible?)(Already done in grid-item-areas?)(Yep, I already created this)
+
 @use "sass:list";
 @use "sass:string";
-
 
 // Variables to make using this set of mixins easier.
 // TODO pick and easier one to use from the latter four.
@@ -17,7 +12,7 @@ $stt: $standard-tablet-threshold;
 $sdt: $standard-desktop-threshold;
 
 // This gets added when _grid.scss is called.
-// This code is what gets _grid to work.
+// This is the base code that _grid needs to work.
 .grid{
     height: var(--height, auto);
     width: var(--width, 100%);
@@ -25,7 +20,7 @@ $sdt: $standard-desktop-threshold;
     // Add border here
 
     display: grid;
-    grid-template-columns: var(--cols, 1fr); // TODO switch 1fr to none?
+    grid-template-columns: var(--cols, 1fr);
     grid-template-rows: var(--rows, 1fr);
     column-gap: var(--col-gap, 0);
     row-gap: var(--row-gap, 0);
@@ -34,15 +29,14 @@ $sdt: $standard-desktop-threshold;
     // Add more grid related stuff here.
 }
 
-// Maker for the item holders.
-// @mixin grid-items($n: 1){
-//     @for $i from 1 through $n {
-//         .grid-item-#{$i}{
-//             grid-area: var(--grid-item-#{$i});
-//             @content;
-//         }
-//     }
-// }
+
+// ******************
+// *** grid-items ***
+// ******************
+// *******************************************
+// *** It takes <number>, <string>, <map>, ***
+// *** and a <list>                        ***
+// *******************************************
 
 @mixin grid-items($items: 1, $modifier: null){
     
@@ -90,6 +84,10 @@ $sdt: $standard-desktop-threshold;
 
 // It takes <name> or <row-start> / <col-start> / <row-end> / <col-end>
 // $list can be a list of <strings> or a <map>
+
+// ******************
+// *** Depracated ***
+// ******************
 @mixin grid-item-areas($list){
 
     // Check to see if the user sent a map or a list.
@@ -172,6 +170,10 @@ $sdt: $standard-desktop-threshold;
 
 
 
+// *************
+// *** _grid ***
+// *************
+
 @mixin _grid(
             // How to size the grid and align/justify the items.
             $height: auto,
@@ -190,7 +192,7 @@ $sdt: $standard-desktop-threshold;
             // How to pad the grid inside and out.
             $col-gap: 0,
             $row-gap: 0,
-            $side-padding: minmax(20px, 1fr),//20px, // Original: 10%
+            $side-padding: minmax(20px, 1fr),
             $top-padding: 0,
             $bottom-padding: 0,
 
@@ -208,7 +210,7 @@ $sdt: $standard-desktop-threshold;
             $tablet-rows: null,
             $tablet-row-repeat: null,
             $tablet-grid-areas: null,
-            $tablet-side-padding: minmax(15px, 1fr), //15px,
+            $tablet-side-padding: minmax(15px, 1fr),
             $tablet-top-padding: 0,
             $tablet-bottom-padding: 0,
             $tablet-col-gap: 0,
@@ -228,7 +230,7 @@ $sdt: $standard-desktop-threshold;
             $desktop-rows: null,
             $desktop-row-repeat: null,
             $desktop-grid-areas: null,
-            $desktop-side-padding: minmax(15px, 1fr), //15px,
+            $desktop-side-padding: minmax(15px, 1fr),
             $desktop-top-padding: 0,
             $desktop-bottom-padding: 0,
             $desktop-col-gap: 0,
@@ -583,7 +585,7 @@ $sdt: $standard-desktop-threshold;
             // This section adds the $side-padding ('.') to the $grid-areas.     ***
             // It also converts the input into a string, for the desktop layout. ***
             // *********************************************************************
-            
+
             @if $desktop-grid-areas != null {
 
                 $temp: null;
@@ -714,7 +716,11 @@ $sdt: $standard-desktop-threshold;
 
 
 
-// Sub-grid is a grid without any type of padding.
+// *****************
+// *** _sub-grid ***
+// *****************
+
+// Sub-grid is a grid without any type of padding on the sides.
 @mixin _sub-grid(
             // How to size the grid and align/justify the items.
             $height: auto,
@@ -739,7 +745,7 @@ $sdt: $standard-desktop-threshold;
             $custom-items: null,
 
             // Where to put the threshold and how to set it up for mobile.
-            $tablet-threshold: 0, // Original: 425px,
+            $tablet-threshold: 0,
             $tablet-height: auto,
             $tablet-width: 100%,
             $tablet-background: none,
@@ -772,6 +778,12 @@ $sdt: $standard-desktop-threshold;
             $desktop-auto-items: false,
             $desktop-custom-items: null){
     
+
+
+    // **************
+    // *** MOBILE *** 
+    // **************
+
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
     --width: #{$width};
@@ -782,19 +794,28 @@ $sdt: $standard-desktop-threshold;
     --row-gap: #{$row-gap};
     
 
-    // Making $grid-areas a string, with quotes.
-    // This will format a list of strings so the CSS code will recognise it.
+
+    // *************************************************************************
+    // This section converts the input into a string, for the mobile layout. ***
+    // *************************************************************************
+
     @if $grid-areas != null {
+
         $temp: null;
+
         @each $area in $grid-areas {
             $temp: $temp + "\"" + $area + "\" ";
         }
+
         $grid-areas: $temp;
 
         --ga: #{$grid-areas}; 
     }
 
     
+    // ***********************************************************************************
+    // (Mobile)  This section creates the column part of the grid based on user input. ***
+    // ***********************************************************************************
 
     @if $cols != null and $col-repeat == null {
         // Manual creation of the grid
@@ -822,6 +843,11 @@ $sdt: $standard-desktop-threshold;
 
         $tablet-col-repeat: 1;
     }
+
+
+    // ********************************************************************************
+    // (Mobile)  This section creates the row part of the grid based on user input. ***
+    // ********************************************************************************
     
     @if $rows != null and $row-repeat == null {
         // Full manual
@@ -851,6 +877,11 @@ $sdt: $standard-desktop-threshold;
 
     }
 
+
+
+    // *********************************************************************************************
+    // (Mobile) This section creates the variables for the items that are placed into the grid.  ***
+    // *********************************************************************************************
 
     // Check and setup the layout of the items, if able to.
     @if $col-repeat > 0 and $row-repeat > 0 and $auto-items{
@@ -891,28 +922,29 @@ $sdt: $standard-desktop-threshold;
                 }
             }
         }
-        
-        // $count: 1;
-        // @each $item in $custom-items {
-        //     --sub-grid-item-#{$count}: #{$item};
-        //     $count: $count + 1;
-        // }
     }
 
     
     
+    // **************
+    // *** TABLET ***
+    // **************
 
-    // Changes for the screen sizes.
     @if type-of($tablet-threshold) == type-of(0) and $tablet-threshold > 0 {
         @media screen and (min-width: $tablet-threshold){
         
-            // The if statements bellow allow us to stop code from repeating itself needlessly.
+            // ********************************************************************
+            // This section changes the layout if needed for the table layout.  ***
+            // ********************************************************************
+            
             @if $height != $tablet-height {
                 --height: #{$tablet-height};
             }
+
             @if $width != $tablet-width {
                 --width: #{$tablet-width};
             }
+
             @if $background != $tablet-background {
                 --bg: #{$tablet-background};
             }
@@ -920,24 +952,43 @@ $sdt: $standard-desktop-threshold;
             @if $justify-items != $tablet-justify-items {
                 justify-items: #{$tablet-justify-items};
             }
+
             @if $align-items != $tablet-align-items {
                 align-items: #{$tablet-align-items};
             }
+
             @if $col-gap != $tablet-col-gap {
                 --col-gap: #{$tablet-col-gap};
             }
+
             @if $row-gap != $tablet-row-gap {
                 --row-gap: #{$tablet-row-gap};
             }
+
+
+            // *************************************************************************
+            // This section converts the input into a string, for the tablet layout. ***
+            // *************************************************************************
+
             @if $tablet-grid-areas != null {
+
                 $temp: null;
+
                 @each $area in $tablet-grid-areas {
+
                     $temp: $temp + "\"" + $area + "\" ";
+
                 }
+
                 $tablet-grid-areas: $temp;
                 --ga: #{$tablet-grid-areas};
             }
 
+
+
+            // ***********************************************************************************
+            // (Tablet)  This section creates the column part of the grid based on user input. ***
+            // ***********************************************************************************
 
             @if $tablet-cols != null and $tablet-col-repeat == null {
                 // Manual creation of the grid
@@ -965,6 +1016,12 @@ $sdt: $standard-desktop-threshold;
         
                 $tablet-col-repeat: 1;
             }
+
+
+
+            // ********************************************************************************
+            // (Tablet)  This section creates the row part of the grid based on user input. ***
+            // ********************************************************************************
             
             @if $tablet-rows != null and $tablet-row-repeat == null {
                 // Full manual
@@ -995,6 +1052,9 @@ $sdt: $standard-desktop-threshold;
             }
 
  
+            // *********************************************************************************************
+            // (Tablet) This section creates the variables for the items that are placed into the grid.  ***
+            // *********************************************************************************************
     
             // Check and setup the layout of the items, if able to.
             @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0 and $tablet-auto-items{
@@ -1038,40 +1098,70 @@ $sdt: $standard-desktop-threshold;
     }
 
 
+    // ***************
+    // *** DESKTOP ***
+    // ***************
+
     @if type-of($desktop-threshold) == type-of(0) and $desktop-threshold > 0 {
         @media screen and (min-width: $desktop-threshold){
+
             @if $height != $desktop-height {
+
                 --height: #{$desktop-height};
             }
+
             @if $width != $desktop-width {
+
                 --width: #{$desktop-width};
             }
+
             @if $background != $desktop-background {
+
                 --bg: #{$desktop-background};
             }
     
             @if $justify-items != $desktop-justify-items {
+
                 justify-items: #{$desktop-justify-items};
             }
+
             @if $align-items != $desktop-align-items {
+
                 align-items: #{$desktop-align-items};
             }
+
             @if $col-gap != $desktop-col-gap {
+
                 --col-gap: #{$desktop-col-gap};
             }
+
             @if $row-gap != $desktop-row-gap {
+
                 --row-gap: #{$desktop-row-gap};
             }
+
+
+            // **************************************************************************
+            // This section converts the input into a string, for the desktop layout. ***
+            // **************************************************************************
+            
             @if $desktop-grid-areas != null {
+
                 $temp: null;
+
                 @each $area in $desktop-grid-areas {
                     $temp: $temp + "\"" + $area + "\" ";
                 }
+
                 $desktop-grid-areas: $temp;
                 --ga: #{$desktop-grid-areas};
             }
     
             
+
+            // ************************************************************************************
+            // (Desktop)  This section creates the column part of the grid based on user input. ***
+            // ************************************************************************************
 
             @if $desktop-cols != null and $desktop-col-repeat == null {
                 // Manual creation of the grid
@@ -1099,6 +1189,12 @@ $sdt: $standard-desktop-threshold;
         
                 $desktop-col-repeat: 1;
             }
+
+
+
+            // ***********************************************************************************
+            // (Desktop)  This section creates the column part of the grid based on user input. ***
+            // ***********************************************************************************
             
             @if $desktop-rows != null and $desktop-row-repeat == null {
                 // Full manual
@@ -1130,6 +1226,10 @@ $sdt: $standard-desktop-threshold;
 
 
     
+            // **********************************************************************************************
+            // (Desktop) This section creates the variables for the items that are placed into the grid.  ***
+            // **********************************************************************************************
+
             // Check and setup the layout of the items, if able to.
             @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0 and $desktop-auto-items{
                 $count: 1;

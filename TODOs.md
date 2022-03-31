@@ -93,21 +93,22 @@
 - [ ] Add better documentation to _grid partials
 - [ ] See about combining sub-grid and grid mixins to shorten code
 - [ ] Try and see if auto-fill and auto-fit will work like I tried before. (_sub-grid?)
-- [ ] When making non repeating cols and rows make the code not use the CSS repeat() (Makes it more custom) (for tablet/desktop too)  
-- [ ] Have the code check whether or not to auto create grid item variables in _grid/_sub-grid (Using a passed variable) (auto-items)  
-- [ ] Have the ability to pass custom grid item variables to _grid/_sub-grid (in a passed variable) (custom-items)  
+- [X] When making non repeating cols and rows make the code not use the CSS repeat() (Makes it more custom) (for tablet/desktop too)  
+- [X] Have the code check whether or not to auto create grid item variables in _grid/_sub-grid (Using a passed variable) (auto-items)  
+- [X] Have the ability to pass custom grid item variables to _grid/_sub-grid (in a passed variable) (custom-items)  
     * Do I need to have $auto-items if I can check if $custom-items is not null?  
     * What if I create a separate function to make --grid-items inside a class instead?  
-- [ ] Have _grid/_sub-grid take a map as well as a list to handle custom lists  
-- [ ] Have the $auto-items switch the direction how they're created? (Along the X-axis or Y-axis first)  
+- [T] Have _grid/_sub-grid take a map as well as a list to handle custom lists (done, needs testing)  
+- [X] Have the $auto-items switch the direction how they're created? (Used for something else) (Along the X-axis or Y-axis first)  
 - [X] Have grid-items/sub-grid-items also take in a <map> to create custom grid areas with the 1/1/1/1 system  
     * (possible?) (Already done in grid-item-areas?) (Yep, I already created this)  
 - [ ] Shorten names to make creating layouts faster.  
 - [ ] Remove grid-item-areas since grid-items now covers it all.  
 - [ ] Make _sub-grid-items not use names and use exclusively numbers?  
-- [ ] Maybe try converting some of _grid/_sub-grid code to use function like parts to reuse and simplify code.  
-- [ ] Add some error checking and messages to the output of the code.  
-
+- [ ] Maybe try converting some of _grid/_sub-grid code to use function like parts to reuse and simplify code. (I don't know if this is possible)  
+- [ ] Add some error checking and messages to the output of the code. (if possible)  
+- [ ] Make sub-grid-items copy grid-itmes if not removing it.    
+- [ ] When grid-items start to use modifiers for the name, _grid/_sub-grid will need to have a modifier to possibly  
 
 # _mixins  TODOs
 - [X] This file is broken. It calls functions that have been moved and don't exist anymore. Fix it.
