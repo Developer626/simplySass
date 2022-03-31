@@ -260,15 +260,15 @@ $sdt: $standard-desktop-threshold;
     }
 
 
-    @if $cols != null and $col-repeat == null {
+    // @if $cols != null and $col-repeat == null {
 
-    }@else if $cols == null and $col-repeat != null{
+    // }@else if $cols == null and $col-repeat != null{
 
-    }@else if $cols != null and $col-repeat != null{
+    // }@else if $cols != null and $col-repeat != null{
 
-    }@else {
+    // }@else {
         
-    }
+    // }
 
 
     @if $cols != null and $col-repeat == null {
@@ -310,7 +310,7 @@ $sdt: $standard-desktop-threshold;
 
         --rows: [grid-row-start] repeat(#{$row-repeat}, [row] auto) [grid-row-end];
 
-    }@else if $rows != null and $col-repeat != null{
+    }@else if $rows != null and $row-repeat != null{
         // Repeat users input X amount of times
 
         --rows: [grid-row-start] repeat(#{$row-repeat}, #{$rows}) [grid-row-end];
@@ -475,7 +475,7 @@ $sdt: $standard-desktop-threshold;
         
                 --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, [row] auto) [grid-row-end];
         
-            }@else if $tablet-rows != null and $col-repeat != null{
+            }@else if $tablet-rows != null and $tablet-row-repeat != null{
                 // Repeat users input X amount of times
         
                 --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [grid-row-end];
@@ -632,6 +632,7 @@ $sdt: $standard-desktop-threshold;
                 $col-repeat: 1;
             }
             
+            
             @if $desktop-rows != null and $desktop-row-repeat == null {
                 // Full manual
         
@@ -644,7 +645,7 @@ $sdt: $standard-desktop-threshold;
         
                 --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, [row] auto) [grid-row-end];
         
-            }@else if $desktop-rows != null and $col-repeat != null{
+            }@else if $desktop-rows != null and $desktop-row-repeat != null{
                 // Repeat users input X amount of times
         
                 --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [grid-row-end];
@@ -819,40 +820,97 @@ $sdt: $standard-desktop-threshold;
 
     
 
-    // Check to see what type of grid setup to use.
-    @if type-of(1) != type-of($cols) and $col-repeat == 1{
-        // Put user manual setup of cols here
-        --cols: [sub-grid-col-start]  #{$cols}  [sub-grid-col-end];
+    @if $cols != null and $col-repeat == null {
+        // Manual creation of the grid
+
+        --cols: [sub-grid-col-start] #{$cols} [sub-grid-col-end];
+
+        $col-repeat: list.length($cols);
+
+    }@else if $cols == null and $col-repeat != null{
+        // Repeat a default
+
+        --cols: [sub-grid-col-start] repeat(#{$col-repeat},[col] 1fr) [sub-grid-col-end];
+
+    }@else if $cols != null and $col-repeat != null{
+        // Repeat users input X amount of times
+
+        --cols: [sub-grid-col-start] repeat(#{$col-repeat}, #{$cols}) [sub-grid-col-end];
 
         $col-repeat: list.length($cols) * $col-repeat;
-    }@else if type-of(1) != type-of($cols){
-        // Put user manual setup of cols here
-        --cols: [sub-grid-col-start]  repeat(#{$col-repeat}, #{$cols})  [sub-grid-col-end];
 
-        $col-repeat: list.length($cols) * $col-repeat;
-    }@else if $col-repeat > 0 {
-        --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
+    }@else {
+        // No user input so just create a single collumn (or default)
+
+        --cols: [sub-grid-col-start] 1fr [sub-grid-col-end];
+
+        $tablet-col-repeat: 1;
     }
+    
+    @if $rows != null and $row-repeat == null {
+        // Full manual
 
-    // TODO Using repeat seems to mess with the expected outcome. I recommend to add another if statement to check for $col-repeat > 1
-    //      and not have repeat used when it does equal to 1.
-    // So, what was messing with the code was using a repeat inside of a repeat. Though that said, it might be better to make the 
-    // CSS code that this code spits out to not use a repeat 1.
-    @if type-of(1) != type-of($rows) and $row-repeat == 1{
-        // Put user manual setup of cols here
         --rows: [sub-grid-row-start] #{$rows} [sub-grid-row-end];
 
         $row-repeat: list.length($rows);
 
-    }@else if type-of(1) != type-of($rows){
-        // Put user manual setup of cols here
+    }@else if $rows == null and $row-repeat != null{
+        // Repeat default
+
+        --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] auto) [sub-grid-row-end];
+
+    }@else if $rows != null and $row-repeat != null{
+        // Repeat users input X amount of times
+
         --rows: [sub-grid-row-start] repeat(#{$row-repeat}, #{$rows}) [sub-grid-row-end];
 
         $row-repeat: list.length($rows) * $row-repeat;
 
-    }@else if $row-repeat > 0 {
-        --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [sub-grid-row-end];
+    }@else {
+        // No user input so just create a single row (or default)
+
+        --rows: [sub-grid-row-start] auto [sub-grid-row-end];
+
+        $row-repeat: 1;
+
     }
+
+
+
+    // // Check to see what type of grid setup to use.
+    // @if type-of(1) != type-of($cols) and $col-repeat == 1{
+    //     // Put user manual setup of cols here
+    //     --cols: [sub-grid-col-start]  #{$cols}  [sub-grid-col-end];
+
+    //     $col-repeat: list.length($cols) * $col-repeat;
+    // }@else if type-of(1) != type-of($cols){
+    //     // Put user manual setup of cols here
+    //     --cols: [sub-grid-col-start]  repeat(#{$col-repeat}, #{$cols})  [sub-grid-col-end];
+
+    //     $col-repeat: list.length($cols) * $col-repeat;
+    // }@else if $col-repeat > 0 {
+    //     --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
+    // }
+
+    // // TODO Using repeat seems to mess with the expected outcome. I recommend to add another if statement to check for $col-repeat > 1
+    // //      and not have repeat used when it does equal to 1.
+    // // So, what was messing with the code was using a repeat inside of a repeat. Though that said, it might be better to make the 
+    // // CSS code that this code spits out to not use a repeat 1.
+    // @if type-of(1) != type-of($rows) and $row-repeat == 1{
+    //     // Put user manual setup of cols here
+    //     --rows: [sub-grid-row-start] #{$rows} [sub-grid-row-end];
+
+    //     $row-repeat: list.length($rows);
+
+    // }@else if type-of(1) != type-of($rows){
+    //     // Put user manual setup of cols here
+    //     --rows: [sub-grid-row-start] repeat(#{$row-repeat}, #{$rows}) [sub-grid-row-end];
+
+    //     $row-repeat: list.length($rows) * $row-repeat;
+
+    // }@else if $row-repeat > 0 {
+    //     --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [sub-grid-row-end];
+    // }
 
     // Check and setup the layout of the items, if able to.
     @if $col-repeat > 0 and $row-repeat > 0 and $auto-items{
@@ -939,40 +997,97 @@ $sdt: $standard-desktop-threshold;
                 $tablet-grid-areas: $temp;
                 --ga: #{$tablet-grid-areas};
             }
-            
 
-            // Check to see what type of grid setup to use.
-            @if type-of(1) != type-of($tablet-cols) and $tablet-col-repeat == 1{
-                // Put user manual setup of cols here
+
+            @if $tablet-cols != null and $tablet-col-repeat == null {
+                // Manual creation of the grid
+        
                 --cols: [sub-grid-col-start] #{$tablet-cols} [sub-grid-col-end];
-
-                $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
         
-            }@else if type-of(1) != type-of($tablet-cols){
-                // Put user manual setup of cols here
+                $tablet-col-repeat: list.length($tablet-cols);
+        
+            }@else if $tablet-cols == null and $tablet-col-repeat != null{
+                // Repeat a default
+        
+                --cols: [sub-grid-col-start] repeat(#{$tablet-col-repeat},[col] 1fr) [sub-grid-col-end];
+        
+            }@else if $tablet-cols != null and $tablet-col-repeat != null{
+                // Repeat users input X amount of times
+        
                 --cols: [sub-grid-col-start] repeat(#{$tablet-col-repeat}, #{$tablet-cols}) [sub-grid-col-end];
-
+        
                 $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
         
-            }@else if $tablet-col-repeat > 0 {
-                --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
+            }@else {
+                // No user input so just create a single collumn (or default)
+        
+                --cols: [sub-grid-col-start] 1fr [sub-grid-col-end];
+        
+                $tablet-col-repeat: 1;
             }
             
-            @if type-of(1) != type-of($tablet-rows) and $tablet-row-repeat == 1{
-                // Put user manual setup of cols here
+            @if $tablet-rows != null and $tablet-row-repeat == null {
+                // Full manual
+        
                 --rows: [sub-grid-row-start] #{$tablet-rows} [sub-grid-row-end];
-
-                $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
         
-            }@else if type-of(1) != type-of($tablet-rows){
-                // Put user manual setup of cols here
+                $tablet-row-repeat: list.length($tablet-rows);
+        
+            }@else if $tablet-rows == null and $tablet-row-repeat != null{
+                // Repeat default
+        
+                --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] auto) [sub-grid-row-end];
+        
+            }@else if $tablet-rows != null and $tablet-row-repeat != null{
+                // Repeat users input X amount of times
+        
                 --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [sub-grid-row-end];
-
+        
                 $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
         
-            }@else if $tablet-row-repeat > 0 {
-                --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [sub-grid-row-end];
+            }@else {
+                // No user input so just create a single row (or default)
+        
+                --rows: [sub-grid-row-start] auto [sub-grid-row-end];
+        
+                $tablet-row-repeat: 1;
+        
             }
+
+            
+
+            // // Check to see what type of grid setup to use.
+            // @if type-of(1) != type-of($tablet-cols) and $tablet-col-repeat == 1{
+            //     // Put user manual setup of cols here
+            //     --cols: [sub-grid-col-start] #{$tablet-cols} [sub-grid-col-end];
+
+            //     $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+        
+            // }@else if type-of(1) != type-of($tablet-cols){
+            //     // Put user manual setup of cols here
+            //     --cols: [sub-grid-col-start] repeat(#{$tablet-col-repeat}, #{$tablet-cols}) [sub-grid-col-end];
+
+            //     $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+        
+            // }@else if $tablet-col-repeat > 0 {
+            //     --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
+            // }
+            
+            // @if type-of(1) != type-of($tablet-rows) and $tablet-row-repeat == 1{
+            //     // Put user manual setup of cols here
+            //     --rows: [sub-grid-row-start] #{$tablet-rows} [sub-grid-row-end];
+
+            //     $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
+        
+            // }@else if type-of(1) != type-of($tablet-rows){
+            //     // Put user manual setup of cols here
+            //     --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [sub-grid-row-end];
+
+            //     $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
+        
+            // }@else if $tablet-row-repeat > 0 {
+            //     --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [sub-grid-row-end];
+            // }
     
             // Check and setup the layout of the items, if able to.
             @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0 and $tablet-auto-items{
@@ -1051,38 +1166,95 @@ $sdt: $standard-desktop-threshold;
     
             
 
-            // Check to see what type of grid setup to use.
-            @if type-of(1) != type-of($desktop-cols) and $desktop-col-repeat == 1{
-                // Put user manual setup of cols here
+            @if $desktop-cols != null and $desktop-col-repeat == null {
+                // Manual creation of the grid
+        
                 --cols: [sub-grid-col-start] #{$desktop-cols} [sub-grid-col-end];
-
-                $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
         
-            }@else if type-of(1) != type-of($desktop-cols){
-                // Put user manual setup of cols here
+                $desktop-col-repeat: list.length($desktop-cols);
+        
+            }@else if $desktop-cols == null and $desktop-col-repeat != null{
+                // Repeat a default
+        
+                --cols: [sub-grid-col-start] repeat(#{$desktop-col-repeat},[col] 1fr) [sub-grid-col-end];
+        
+            }@else if $desktop-cols != null and $desktop-col-repeat != null{
+                // Repeat users input X amount of times
+        
                 --cols: [sub-grid-col-start] repeat(#{$desktop-col-repeat}, #{$desktop-cols}) [sub-grid-col-end];
-
+        
                 $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
         
-            }@else if $desktop-col-repeat > 0 {
-                --cols:  [sub-grid-col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [sub-grid-col-end];
+            }@else {
+                // No user input so just create a single collumn (or default)
+        
+                --cols: [sub-grid-col-start] 1fr [sub-grid-col-end];
+        
+                $desktop-col-repeat: 1;
             }
-    
-            @if type-of(1) != type-of($desktop-rows) and $desktop-row-repeat == 1{
-                // Put user manual setup of cols here
+            
+            @if $desktop-rows != null and $desktop-row-repeat == null {
+                // Full manual
+        
                 --rows: [sub-grid-row-start] #{$desktop-rows} [sub-grid-row-end];
-
-                $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
         
-            }@else if type-of(1) != type-of($desktop-rows){
-                // Put user manual setup of cols here
+                $desktop-row-repeat: list.length($desktop-rows);
+        
+            }@else if $desktop-rows == null and $desktop-row-repeat != null{
+                // Repeat default
+        
+                --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, [row] auto) [sub-grid-row-end];
+        
+            }@else if $desktop-rows != null and $desktop-row-repeat != null{
+                // Repeat users input X amount of times
+        
                 --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [sub-grid-row-end];
-
+        
                 $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
         
-            }@else if $desktop-row-repeat > 0 {
-                --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, [row] 1fr) [sub-grid-row-end];
+            }@else {
+                // No user input so just create a single row (or default)
+        
+                --rows: [sub-grid-row-start] auto [sub-grid-row-end];
+        
+                $desktop-row-repeat: 1;
+        
             }
+
+
+
+            // // Check to see what type of grid setup to use.
+            // @if type-of(1) != type-of($desktop-cols) and $desktop-col-repeat == 1{
+            //     // Put user manual setup of cols here
+            //     --cols: [sub-grid-col-start] #{$desktop-cols} [sub-grid-col-end];
+
+            //     $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
+        
+            // }@else if type-of(1) != type-of($desktop-cols){
+            //     // Put user manual setup of cols here
+            //     --cols: [sub-grid-col-start] repeat(#{$desktop-col-repeat}, #{$desktop-cols}) [sub-grid-col-end];
+
+            //     $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
+        
+            // }@else if $desktop-col-repeat > 0 {
+            //     --cols:  [sub-grid-col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [sub-grid-col-end];
+            // }
+    
+            // @if type-of(1) != type-of($desktop-rows) and $desktop-row-repeat == 1{
+            //     // Put user manual setup of cols here
+            //     --rows: [sub-grid-row-start] #{$desktop-rows} [sub-grid-row-end];
+
+            //     $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
+        
+            // }@else if type-of(1) != type-of($desktop-rows){
+            //     // Put user manual setup of cols here
+            //     --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [sub-grid-row-end];
+
+            //     $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
+        
+            // }@else if $desktop-row-repeat > 0 {
+            //     --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, [row] 1fr) [sub-grid-row-end];
+            // }
     
             // Check and setup the layout of the items, if able to.
             @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0 and $desktop-auto-items{
