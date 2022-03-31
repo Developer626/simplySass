@@ -238,38 +238,44 @@ $sdt: $standard-desktop-threshold;
             $desktop-auto-items: false,
             $desktop-custom-items: null){
     
+
+
+    // **************
+    // *** MOBILE ***
+    // **************
+
     //Setup some variables that won't change for this screen size here.
     --height: #{$height};
     --width: #{$width};
     --bg: #{$background};
-    justify-items: #{$justify-items};  // TODO Should I write this code into the .grid like the others in this code section?
+    justify-items: #{$justify-items};
     align-items: #{$align-items};
-    --col-gap: #{$col-gap};  // TODO If .grid handles this when it's 0, should I have the code remove it? What if it's set somewhere else and someone wants it to be set to 0 then?
+    --col-gap: #{$col-gap};
     --row-gap: #{$row-gap};
 
-    // Making $grid-areas a string, with quotes.
-    // This will allow this mixin to take in a list and properly output it in CSS.
+
+    // ********************************************************************
+    // This section adds the $side-padding ('.') to the $grid-areas.    ***
+    // It also converts the input into a string, for the mobile layout. ***
+    // ********************************************************************
+
     @if $grid-areas != null {
+
         $temp: null;
+
         @each $area in $grid-areas {
             $temp: $temp + "\". " + $area + " .\" ";
         }
         $grid-areas: $temp;
 
-        --ga: #{$grid-areas}; // TODO switch this to grid-areas
+        --ga: #{$grid-areas}; 
     }
 
 
-    // @if $cols != null and $col-repeat == null {
 
-    // }@else if $cols == null and $col-repeat != null{
-
-    // }@else if $cols != null and $col-repeat != null{
-
-    // }@else {
-        
-    // }
-
+    // ***********************************************************************************
+    // (Mobile)  This section creates the column part of the grid based on user input. ***
+    // ***********************************************************************************
 
     @if $cols != null and $col-repeat == null {
         // Manual creation of the grid
@@ -298,6 +304,11 @@ $sdt: $standard-desktop-threshold;
         $col-repeat: 1;
     }
     
+
+    // *********************************************************************************
+    // (Mobile)  This section creates the row part of the grid based on user input.  ***
+    // *********************************************************************************
+
     @if $rows != null and $row-repeat == null {
         // Full manual
 
@@ -326,41 +337,12 @@ $sdt: $standard-desktop-threshold;
 
     }
 
-    // @if type-of(1) != type-of($cols) and $col-repeat == 1{
-        
-    //     // Put user manual setup of cols here
-    //     --cols: [grid-col-start] #{$side-padding} #{$cols} #{$side-padding} [grid-col-end];
 
-    //     $col-repeat: list.length($cols) * $col-repeat;
 
-    // }@else if type-of(1) != type-of($cols){
-        
-    //     // Put user manual setup of cols here
-    //     --cols: [grid-col-start] #{$side-padding} repeat(#{$col-repeat}, #{$cols}) #{$side-padding} [grid-col-end];
+    // *********************************************************************************************
+    // (Mobile) This section creates the variables for the items that are placed into the grid.  ***
+    // *********************************************************************************************
 
-    //     $col-repeat: list.length($cols) * $col-repeat;
-
-    // }@else if $col-repeat > 0 {
-    //     --cols:  [grid-col-start] #{$side-padding} [col-start] repeat(#{$col-repeat}, [col] 1fr) [col-end] #{$side-padding} [grid-col-end];
-    // }
-
-    // @if type-of(1) != type-of($rows) and $row-repeat == 1{
-    //     // Put user manual setup of cols here
-    //     --rows: [grid-row-start] #{$rows} [grid-row-end];
-
-    //     $row-repeat: list.length($rows);
-
-    // }@else if type-of(1) != type-of($rows){
-    //     // Put user manual setup of cols here
-    //     --rows: [grid-row-start] repeat(#{$row-repeat}, #{$rows}) [grid-row-end];
-
-    //     $row-repeat: list.length($rows) * $row-repeat;
-
-    // }@else if $row-repeat > 0 {
-    //     --rows: [grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [grid-row-end];
-    // }
-
-     
     @if $col-repeat > 0 and $row-repeat > 0 and $auto-items{
         $count: 1;
         @for $i from 1 through $row-repeat{
@@ -400,21 +382,21 @@ $sdt: $standard-desktop-threshold;
     }
     
 
+
+
+
+    // **************
+    // *** TABLET ***
+    // **************
+
     // Changes for different layouts/screen sizes.
     @if type-of($tablet-threshold) == type-of(0) and $tablet-threshold > 0 {
         @media screen and (min-width: $tablet-threshold){
         
-            // The if statements bellow allow us to stop code from repeating itself needlessly.
-            // @if $height != $tablet-height {
-            //     --height: #{$tablet-height};
-            // }
-            // @if $width != $tablet-width {
-            //     --width: #{$tablet-width};
-            // }
-            // @if $background != $tablet-background {
-            //     --bg: #{$tablet-background};
-            // }
-    
+            // ********************************************************************
+            // This section changes the layout if needed for the table layout.  ***
+            // ********************************************************************
+
             @if $justify-items != $tablet-justify-items {
                 justify-items: #{$tablet-justify-items};
             }
@@ -427,34 +409,55 @@ $sdt: $standard-desktop-threshold;
             @if $row-gap != $tablet-row-gap {
                 --row-gap: #{$tablet-row-gap};
             }
+
+
+            // ********************************************************************
+            // This section adds the $side-padding ('.') to the $grid-areas.    ***
+            // It also converts the input into a string, for the tablet layout. ***
+            // ********************************************************************
+
             @if $tablet-grid-areas != null {
+
                 $temp: null;
+
                 @each $area in $tablet-grid-areas {
                     $temp: $temp + "\". " + $area + " .\" ";
                 }
+
                 $tablet-grid-areas: $temp;
                 --ga: #{$tablet-grid-areas};
             }
             
+
+            // ***********************************************************************************
+            // (Tablet)  This section creates the column part of the grid based on user input. ***
+            // ***********************************************************************************
+
             @if $tablet-cols != null and $tablet-col-repeat == null {
-                // Manual creation of the grid
-        
+                // Manual creation of the grid's columns for tablet.
+                
                 --cols: [grid-col-start] #{$tablet-side-padding} #{$tablet-cols} #{$tablet-side-padding} [grid-col-end];
         
                 $tablet-col-repeat: list.length($tablet-cols);
         
+
+            
             }@else if $tablet-cols == null and $tablet-col-repeat != null{
                 // Repeat a default
         
                 --cols: [grid-col-start] #{$tablet-side-padding} repeat(#{$tablet-col-repeat},[col] 1fr) #{$tablet-side-padding} [grid-col-end];
         
+
+            
             }@else if $tablet-cols != null and $tablet-col-repeat != null{
                 // Repeat users input X amount of times
         
                 --cols: [grid-col-start] #{$tablet-side-padding} repeat(#{$tablet-col-repeat}, #{$tablet-cols}) #{$tablet-side-padding} [grid-col-end];
         
                 $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
-        
+
+
+            
             }@else {
                 // No user input so just create a single collumn (or default)
         
@@ -463,6 +466,12 @@ $sdt: $standard-desktop-threshold;
                 $col-repeat: 1;
             }
             
+
+
+            // ********************************************************************************
+            // (Tablet)  This section creates the row part of the grid based on user input. ***
+            // ********************************************************************************
+
             @if $tablet-rows != null and $tablet-row-repeat == null {
                 // Full manual
         
@@ -470,11 +479,13 @@ $sdt: $standard-desktop-threshold;
         
                 $tablet-row-repeat: list.length($tablet-rows);
         
+
             }@else if $tablet-rows == null and $tablet-row-repeat != null{
                 // Repeat default
         
                 --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, [row] auto) [grid-row-end];
         
+
             }@else if $tablet-rows != null and $tablet-row-repeat != null{
                 // Repeat users input X amount of times
         
@@ -482,6 +493,7 @@ $sdt: $standard-desktop-threshold;
         
                 $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
         
+
             }@else {
                 // No user input so just create a single tablet-row (or default)
         
@@ -491,42 +503,12 @@ $sdt: $standard-desktop-threshold;
         
             }
     
-            // // Check to see what type of grid setup to use.
-            // @if type-of(1) != type-of($tablet-cols) and $tablet-col-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --cols: [grid-col-start] #{$tablet-side-padding} #{$tablet-cols} #{$tablet-side-padding} [grid-col-end];
-
-            //     $tablet-col-repeat: list.length($tablet-cols);
-        
-            // // ***** TODO ***** There's an error here. I wanted to use one value and had it repeated, but it went to the next if statement.
-            // }@else if type-of(1) != type-of($tablet-cols){
-            //     // Put user manual setup of cols here
-            //     @debug $tablet-cols;
-            //     --cols: [grid-col-start] #{$tablet-side-padding} repeat(#{$tablet-col-repeat}, #{$tablet-cols}) #{$tablet-side-padding} [grid-col-end];
-
-            //     $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
-        
-            // }@else if $tablet-col-repeat > 0 {
-            //     --cols:  [grid-col-start] #{$tablet-side-padding} [col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [col-end] #{$tablet-side-padding} [grid-col-end];
-            // }
     
-            // @if type-of(1) != type-of($tablet-rows) and $tablet-row-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --rows: [grid-row-start] #{$tablet-rows} [grid-row-end];
+            
+            // *********************************************************************************************
+            // (Tablet) This section creates the variables for the items that are placed into the grid.  ***
+            // *********************************************************************************************
 
-            //     $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
-        
-            // }@else if type-of(1) != type-of($tablet-rows){
-            //     // Put user manual setup of cols here
-            //     --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [grid-row-end];
-
-            //     $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
-        
-            // }@else if $tablet-row-repeat > 0 {
-            //     --rows: [grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [grid-row-end];
-            // }
-    
-            // Check and setup the layout of the items, if able to.
             @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0 and $tablet-auto-items{
                 $count: 1;
                 @for $i from 1 through $tablet-row-repeat{
@@ -568,20 +550,20 @@ $sdt: $standard-desktop-threshold;
     }
 
 
+
+    // ***************
+    // *** DESKTOP ***
+    // ***************
+
     // Check to see if the $desktop-threshold has been changed, and add a desktop code if it has.
     @if type-of($desktop-threshold) == type-of(0) and $desktop-threshold > 0 {
         @media screen and (min-width: $desktop-threshold){
-            // The bellow code may be needed later.
-            // @if $height != $desktop-height {
-            //     --height: #{$desktop-height};
-            // }
-            // @if $width != $desktop-width {
-            //     --width: #{$desktop-width};
-            // }
-            // @if $background != $desktop-background {
-            //     --bg: #{$desktop-background};
-            // }
-    
+
+
+            // **********************************************************************
+            // This section changes the layout if needed for the desktop layout.  ***
+            // **********************************************************************
+
             @if $justify-items != $desktop-justify-items {
                 justify-items: #{$desktop-justify-items};
             }
@@ -594,16 +576,31 @@ $sdt: $standard-desktop-threshold;
             @if $row-gap != $desktop-row-gap {
                 --row-gap: #{$desktop-row-gap};
             }
+
+
+
+            // *********************************************************************
+            // This section adds the $side-padding ('.') to the $grid-areas.     ***
+            // It also converts the input into a string, for the desktop layout. ***
+            // *********************************************************************
+            
             @if $desktop-grid-areas != null {
+
                 $temp: null;
+
                 @each $area in $desktop-grid-areas {
                     $temp: $temp + "\". " + $area + " .\" ";
                 }
+
                 $desktop-grid-areas: $temp;
                 --ga: #{$desktop-grid-areas};
             }
     
             
+
+            // ************************************************************************************
+            // (Desktop)  This section creates the column part of the grid based on user input. ***
+            // ************************************************************************************
 
             @if $desktop-cols != null and $desktop-col-repeat == null {
                 // Manual creation of the grid
@@ -633,6 +630,10 @@ $sdt: $standard-desktop-threshold;
             }
             
             
+            // *********************************************************************************
+            // (Desktop)  This section creates the row part of the grid based on user input. ***
+            // *********************************************************************************
+
             @if $desktop-rows != null and $desktop-row-repeat == null {
                 // Full manual
         
@@ -640,11 +641,13 @@ $sdt: $standard-desktop-threshold;
         
                 $desktop-row-repeat: list.length($desktop-rows);
         
+
             }@else if $desktop-rows == null and $desktop-row-repeat != null{
                 // Repeat default
         
                 --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, [row] auto) [grid-row-end];
         
+
             }@else if $desktop-rows != null and $desktop-row-repeat != null{
                 // Repeat users input X amount of times
         
@@ -652,6 +655,7 @@ $sdt: $standard-desktop-threshold;
         
                 $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
         
+
             }@else {
                 // No user input so just create a single desktop-row (or default)
         
@@ -662,40 +666,11 @@ $sdt: $standard-desktop-threshold;
             }
 
 
-            // // Check to see what type of grid setup to use.
-            // @if type-of(1) != type-of($desktop-cols) and $desktop-col-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --cols: [grid-col-start] #{$desktop-side-padding} #{$desktop-cols} #{$desktop-side-padding} [grid-col-end];
-
-            //     $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
-        
-            // }@else if type-of(1) != type-of($desktop-cols){
-            //     // Put user manual setup of cols here
-            //     --cols: [grid-col-start] #{$desktop-side-padding} repeat(#{$desktop-col-repeat}, #{$desktop-cols}) #{$desktop-side-padding} [grid-col-end];
-
-            //     $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
-        
-            // }@else if $desktop-col-repeat > 0 {
-            //     --cols:  [grid-col-start] #{$desktop-side-padding} [col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [col-end] #{$desktop-side-padding} [grid-col-end];
-            // }
     
-            // @if type-of(1) != type-of($desktop-rows) and $desktop-row-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --rows: [grid-row-start] #{$desktop-rows} [grid-row-end];
+            // **********************************************************************************************
+            // (Desktop) This section creates the variables for the items that are placed into the grid.  ***
+            // **********************************************************************************************
 
-            //     $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
-        
-            // }@else if type-of(1) != type-of($desktop-rows){
-            //     // Put user manual setup of cols here
-            //     --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [grid-row-end];
-
-            //     $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
-        
-            // }@else if $desktop-row-repeat > 0 {
-            //     --rows: [grid-row-start] repeat(#{$desktop-row-repeat}, [row] 1fr) [grid-row-end];
-            // }
-    
-            // Check and setup the layout of the items, if able to.
             @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0 and $desktop-auto-items{
                 $count: 1;
                 @for $i from 1 through $desktop-row-repeat{
@@ -736,6 +711,7 @@ $sdt: $standard-desktop-threshold;
         }
     }
 }
+
 
 
 // Sub-grid is a grid without any type of padding.
@@ -875,42 +851,6 @@ $sdt: $standard-desktop-threshold;
 
     }
 
-
-
-    // // Check to see what type of grid setup to use.
-    // @if type-of(1) != type-of($cols) and $col-repeat == 1{
-    //     // Put user manual setup of cols here
-    //     --cols: [sub-grid-col-start]  #{$cols}  [sub-grid-col-end];
-
-    //     $col-repeat: list.length($cols) * $col-repeat;
-    // }@else if type-of(1) != type-of($cols){
-    //     // Put user manual setup of cols here
-    //     --cols: [sub-grid-col-start]  repeat(#{$col-repeat}, #{$cols})  [sub-grid-col-end];
-
-    //     $col-repeat: list.length($cols) * $col-repeat;
-    // }@else if $col-repeat > 0 {
-    //     --cols:  [sub-grid-col-start]  repeat(#{$col-repeat}, [col] 1fr)  [sub-grid-col-end];
-    // }
-
-    // // TODO Using repeat seems to mess with the expected outcome. I recommend to add another if statement to check for $col-repeat > 1
-    // //      and not have repeat used when it does equal to 1.
-    // // So, what was messing with the code was using a repeat inside of a repeat. Though that said, it might be better to make the 
-    // // CSS code that this code spits out to not use a repeat 1.
-    // @if type-of(1) != type-of($rows) and $row-repeat == 1{
-    //     // Put user manual setup of cols here
-    //     --rows: [sub-grid-row-start] #{$rows} [sub-grid-row-end];
-
-    //     $row-repeat: list.length($rows);
-
-    // }@else if type-of(1) != type-of($rows){
-    //     // Put user manual setup of cols here
-    //     --rows: [sub-grid-row-start] repeat(#{$row-repeat}, #{$rows}) [sub-grid-row-end];
-
-    //     $row-repeat: list.length($rows) * $row-repeat;
-
-    // }@else if $row-repeat > 0 {
-    //     --rows: [sub-grid-row-start] repeat(#{$row-repeat}, [row] 1fr) [sub-grid-row-end];
-    // }
 
     // Check and setup the layout of the items, if able to.
     @if $col-repeat > 0 and $row-repeat > 0 and $auto-items{
@@ -1054,40 +994,7 @@ $sdt: $standard-desktop-threshold;
         
             }
 
-            
-
-            // // Check to see what type of grid setup to use.
-            // @if type-of(1) != type-of($tablet-cols) and $tablet-col-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --cols: [sub-grid-col-start] #{$tablet-cols} [sub-grid-col-end];
-
-            //     $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
-        
-            // }@else if type-of(1) != type-of($tablet-cols){
-            //     // Put user manual setup of cols here
-            //     --cols: [sub-grid-col-start] repeat(#{$tablet-col-repeat}, #{$tablet-cols}) [sub-grid-col-end];
-
-            //     $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
-        
-            // }@else if $tablet-col-repeat > 0 {
-            //     --cols:  [sub-grid-col-start] repeat(#{$tablet-col-repeat}, [col] 1fr) [sub-grid-col-end];
-            // }
-            
-            // @if type-of(1) != type-of($tablet-rows) and $tablet-row-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --rows: [sub-grid-row-start] #{$tablet-rows} [sub-grid-row-end];
-
-            //     $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
-        
-            // }@else if type-of(1) != type-of($tablet-rows){
-            //     // Put user manual setup of cols here
-            //     --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, #{$tablet-rows}) [sub-grid-row-end];
-
-            //     $tablet-row-repeat: list.length($tablet-rows) * $tablet-row-repeat;
-        
-            // }@else if $tablet-row-repeat > 0 {
-            //     --rows: [sub-grid-row-start] repeat(#{$tablet-row-repeat}, [row] 1fr) [sub-grid-row-end];
-            // }
+ 
     
             // Check and setup the layout of the items, if able to.
             @if $tablet-col-repeat > 0 and $tablet-row-repeat > 0 and $tablet-auto-items{
@@ -1222,39 +1129,6 @@ $sdt: $standard-desktop-threshold;
             }
 
 
-
-            // // Check to see what type of grid setup to use.
-            // @if type-of(1) != type-of($desktop-cols) and $desktop-col-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --cols: [sub-grid-col-start] #{$desktop-cols} [sub-grid-col-end];
-
-            //     $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
-        
-            // }@else if type-of(1) != type-of($desktop-cols){
-            //     // Put user manual setup of cols here
-            //     --cols: [sub-grid-col-start] repeat(#{$desktop-col-repeat}, #{$desktop-cols}) [sub-grid-col-end];
-
-            //     $desktop-col-repeat: list.length($desktop-cols) * $desktop-col-repeat;
-        
-            // }@else if $desktop-col-repeat > 0 {
-            //     --cols:  [sub-grid-col-start] repeat(#{$desktop-col-repeat}, [col] 1fr) [sub-grid-col-end];
-            // }
-    
-            // @if type-of(1) != type-of($desktop-rows) and $desktop-row-repeat == 1{
-            //     // Put user manual setup of cols here
-            //     --rows: [sub-grid-row-start] #{$desktop-rows} [sub-grid-row-end];
-
-            //     $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
-        
-            // }@else if type-of(1) != type-of($desktop-rows){
-            //     // Put user manual setup of cols here
-            //     --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, #{$desktop-rows}) [sub-grid-row-end];
-
-            //     $desktop-row-repeat: list.length($desktop-rows) * $desktop-row-repeat;
-        
-            // }@else if $desktop-row-repeat > 0 {
-            //     --rows: [sub-grid-row-start] repeat(#{$desktop-row-repeat}, [row] 1fr) [sub-grid-row-end];
-            // }
     
             // Check and setup the layout of the items, if able to.
             @if $desktop-col-repeat > 0 and $desktop-row-repeat > 0 and $desktop-auto-items{
