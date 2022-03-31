@@ -266,3 +266,13 @@ $palette: [];
 //     @include _grid($row-repeat: 2,
 //                     $tablet-threshold: 768px, $tablet-cols: 1fr 2fr, $tablet-row-repeat: 1);
 // }
+$test-list: 1 1 1;
+$test-str: "dsf";
+$test-list-str: "dsfds" "sfds";
+
+@debug type-of(1fr);
+@debug type-of(1);
+@debug type-of($test-list);
+@debug type-of($test-str);
+@debug type-of($test-list-str);
+

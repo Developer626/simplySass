@@ -27,8 +27,8 @@ $sdt: $standard-desktop-threshold;
     display: grid;
     grid-template-columns: var(--cols, 1fr); // TODO switch 1fr to none?
     grid-template-rows: var(--rows, 1fr);
-    grid-column-gap: var(--col-gap, 0);
-    grid-row-gap: var(--row-gap, 0);
+    column-gap: var(--col-gap, 0);
+    row-gap: var(--row-gap, 0);
     grid-template-areas: var(--ga, "");
 
     // Add more grid related stuff here.
@@ -190,7 +190,7 @@ $sdt: $standard-desktop-threshold;
             // How to pad the grid inside and out.
             $col-gap: 0,
             $row-gap: 0,
-            $side-padding: 20px, // Original: 10%
+            $side-padding: minmax(20px, 1fr),//20px, // Original: 10%
             $top-padding: 0,
             $bottom-padding: 0,
 
@@ -208,7 +208,7 @@ $sdt: $standard-desktop-threshold;
             $tablet-rows: 1,
             $tablet-row-repeat: 1,
             $tablet-grid-areas: null,
-            $tablet-side-padding: 15px,
+            $tablet-side-padding: minmax(15px, 1fr), //15px,
             $tablet-top-padding: 0,
             $tablet-bottom-padding: 0,
             $tablet-col-gap: 0,
@@ -228,7 +228,7 @@ $sdt: $standard-desktop-threshold;
             $desktop-rows: 1,
             $desktop-row-repeat: 1,
             $desktop-grid-areas: null,
-            $desktop-side-padding: 15px,
+            $desktop-side-padding: minmax(15px, 1fr), //15px,
             $desktop-top-padding: 0,
             $desktop-bottom-padding: 0,
             $desktop-col-gap: 0,
@@ -375,10 +375,12 @@ $sdt: $standard-desktop-threshold;
                 // Put user manual setup of cols here
                 --cols: [grid-col-start] #{$tablet-side-padding} #{$tablet-cols} #{$tablet-side-padding} [grid-col-end];
 
-                $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
+                $tablet-col-repeat: list.length($tablet-cols);
         
+            // ***** TODO ***** There's an error here. I wanted to use one value and had it repeated, but it went to the next if statement.
             }@else if type-of(1) != type-of($tablet-cols){
                 // Put user manual setup of cols here
+                @debug $tablet-cols;
                 --cols: [grid-col-start] #{$tablet-side-padding} repeat(#{$tablet-col-repeat}, #{$tablet-cols}) #{$tablet-side-padding} [grid-col-end];
 
                 $tablet-col-repeat: list.length($tablet-cols) * $tablet-col-repeat;
