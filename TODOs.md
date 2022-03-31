@@ -18,6 +18,7 @@
 - [ ] A minified version of the project.
 - [ ] Update FEATURES.md (Add to "Wanted Features" and "Current Featrues")
 - [ ] Remove TODO-List.txt
+- [ ] Start using branching for development and bug fixing.  
 
 
 
@@ -104,7 +105,8 @@
 - [ ] Shorten names to make creating layouts faster.  
 - [ ] Remove grid-item-areas since grid-items now covers it all.  
 - [ ] Make _sub-grid-items not use names and use exclusively numbers?  
-- [ ] Maybe try converting some of _grid/_sub-grid code to use function like parts to reuse and simplify code.
+- [ ] Maybe try converting some of _grid/_sub-grid code to use function like parts to reuse and simplify code.  
+- [ ] Add some error checking and messages to the output of the code.  
 
 
 # _mixins  TODOs
