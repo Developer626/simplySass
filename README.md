@@ -2,7 +2,7 @@
 
 ## Just a Sass library still in its infancy.
 
-Version 0.1.1 (Alpha)
+Version 0.2.7 (Alpha)
 While it does work, this is still considered in Alpha and things will break. This will be due to moving names and functions around where is will make more sense.
 
 simplySass is a Sass library focused on mobile-first design, which helps quickly write clean CSS code. 
