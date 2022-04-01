@@ -10,3 +10,4 @@ As of now, it's able to make use of CSS grid, and some color functions of Sass. 
 incorporate more features like the use of the popular flexbox and more. Since this is a new project it
 will have some breaking changes in the future, but feel free to use it and try it out as it grows.
 
+*** Warning *** The Documentation is not currently up to date. Most of it should still work, but there are extra features that are not explained yet.
