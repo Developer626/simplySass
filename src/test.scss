@@ -276,3 +276,34 @@ $test-list-str: "dsfds" "sfds";
 @debug type-of($test-str);
 @debug type-of($test-list-str);
 
+// Does not work, even though this could make coding easier and cleaner.
+// Error: Mixins may not contain mixin declarations.
+// Error: Mixins may not contain function declarations.
+// @mixin mixinIsideMixin(
+//     $text: "test"
+
+// ){
+//     @function test(){
+//         @return "content: " + $text;
+//     }
+// }
+
+// .someclass{
+//     @include mixinIsideMixin();
+// }
+
+@mixin mixinIsideMixin(
+    $text: "test"
+    ){
+    @include test($text)
+}
+
+@mixin test(
+    $test: "some holder text"
+){
+    content: $test;
+}
+
+.someclass{
+    @include mixinIsideMixin();
+}
