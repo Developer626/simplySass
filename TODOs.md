@@ -113,6 +113,7 @@
 - [X] Add an extra screen sizes (large screen, portrait and landscape) to _grid  
 - [ ] Add an extra screen sizes (large screen, portrait and landscape) to _sub-grid  
 - [ ] Test the extra screen sizes  
+- [ ] Create a mixin inside of _grid to condense code  
 - [ ] Add a top and bottom padding var to _grid/_sub-grid (Just a simple way to add space between sections)  
 - [ ] An idea for the future (not sure if it would be helpful/useful). Make a dynamic generated media queries that are made from lists and maps?  
 
