@@ -110,7 +110,11 @@
 - [ ] Make sub-grid-items copy grid-itmes if not removing it.    
 - [ ] When grid-items start to use modifiers for the name, _grid/_sub-grid will need to have a modifier to possibly  
 - [ ] Make grid-items use more variables to create more custom classes?  
-- [ ] Add an extra large screen setting to _grid/_sub-grid  
+- [X] Add an extra screen sizes (large screen, portrait and landscape) to _grid  
+- [ ] Add an extra screen sizes (large screen, portrait and landscape) to _sub-grid  
+- [ ] Test the extra screen sizes  
+- [ ] Add a top and bottom padding var to _grid/_sub-grid (Just a simple way to add space between sections)  
+- [ ] An idea for the future (not sure if it would be helpful/useful). Make a dynamic generated media queries that are made from lists and maps?  
 
 # _mixins  TODOs
 - [X] This file is broken. It calls functions that have been moved and don't exist anymore. Fix it.
