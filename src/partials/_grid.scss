@@ -1313,6 +1313,23 @@ $sdt: $standard-desktop-threshold;
             $custom-items: null,
 
             // Where to put the threshold and how to set it up for mobile.
+            $large-mobile-threshold: 0,
+            $large-mobile-height: auto,
+            $large-mobile-width: 100%,
+            $large-mobile-background: none,
+            $large-mobile-cols: null,
+            $large-mobile-col-repeat: null,
+            $large-mobile-rows: null,
+            $large-mobile-row-repeat: null,
+            $large-mobile-grid-areas: null,
+            $large-mobile-col-gap: 0,
+            $large-mobile-row-gap: 0,
+            $large-mobile-justify-items: center,
+            $large-mobile-align-items: center,
+            $large-mobile-auto-items: false,
+            $large-mobile-custom-items: null,
+
+            // Where to put the threshold and how to set it up for mobile.
             $tablet-threshold: 0,
             $tablet-height: auto,
             $tablet-width: 100%,
@@ -1328,6 +1345,23 @@ $sdt: $standard-desktop-threshold;
             $tablet-align-items: center,
             $tablet-auto-items: false,
             $tablet-custom-items: null,
+
+            // Where to put the threshold and how to set it up for mobile.
+            $large-tablet-threshold: 0,
+            $large-tablet-height: auto,
+            $large-tablet-width: 100%,
+            $large-tablet-background: none,
+            $large-tablet-cols: null,
+            $large-tablet-col-repeat: null,
+            $large-tablet-rows: null,
+            $large-tablet-row-repeat: null,
+            $large-tablet-grid-areas: null,
+            $large-tablet-col-gap: 0,
+            $large-tablet-row-gap: 0,
+            $large-tablet-justify-items: center,
+            $large-tablet-align-items: center,
+            $large-tablet-auto-items: false,
+            $large-tablet-custom-items: null,
             
             // Where to put the threshold and how to set it up for tablet.
             $desktop-threshold: 0,
@@ -1344,7 +1378,24 @@ $sdt: $standard-desktop-threshold;
             $desktop-justify-items: center,
             $desktop-align-items: center,
             $desktop-auto-items: false,
-            $desktop-custom-items: null){
+            $desktop-custom-items: null,
+            
+            // Where to put the threshold and how to set it up for tablet.
+            $large-desktop-threshold: 0,
+            $large-desktop-height: auto,
+            $large-desktop-width: 100%,
+            $large-desktop-background: none,
+            $large-desktop-cols: null,
+            $large-desktop-col-repeat: null,
+            $large-desktop-rows: null,
+            $large-desktop-row-repeat: null,
+            $large-desktop-grid-areas: null,
+            $large-desktop-col-gap: 0,
+            $large-desktop-row-gap: 0,
+            $large-desktop-justify-items: center,
+            $large-desktop-align-items: center,
+            $large-desktop-auto-items: false,
+            $large-desktop-custom-items: null){
     
 
 
@@ -1491,6 +1542,181 @@ $sdt: $standard-desktop-threshold;
             }
         }
     }
+
+
+
+    
+    // ********************
+    // *** LARGE MOBILE ***
+    // ********************
+
+    @if type-of($large-mobile-threshold) == type-of(0) and $large-mobile-threshold > 0 {
+        @media screen and (min-width: $large-mobile-threshold){
+        
+            // ********************************************************************
+            // This section changes the layout if needed for the table layout.  ***
+            // ********************************************************************
+            
+            @if $height != $large-mobile-height {
+                --height: #{$large-mobile-height};
+            }
+
+            @if $width != $large-mobile-width {
+                --width: #{$large-mobile-width};
+            }
+
+            @if $background != $large-mobile-background {
+                --bg: #{$large-mobile-background};
+            }
+    
+            @if $justify-items != $large-mobile-justify-items {
+                justify-items: #{$large-mobile-justify-items};
+            }
+
+            @if $align-items != $large-mobile-align-items {
+                align-items: #{$large-mobile-align-items};
+            }
+
+            @if $col-gap != $large-mobile-col-gap {
+                --col-gap: #{$large-mobile-col-gap};
+            }
+
+            @if $row-gap != $large-mobile-row-gap {
+                --row-gap: #{$large-mobile-row-gap};
+            }
+
+
+            // *************************************************************************
+            // This section converts the input into a string, for the large-mobile layout. ***
+            // *************************************************************************
+
+            @if $large-mobile-grid-areas != null {
+
+                $temp: null;
+
+                @each $area in $large-mobile-grid-areas {
+
+                    $temp: $temp + "\"" + $area + "\" ";
+
+                }
+
+                $large-mobile-grid-areas: $temp;
+                --ga: #{$large-mobile-grid-areas};
+            }
+
+
+
+            // ***********************************************************************************
+            // (large-mobile)  This section creates the column part of the grid based on user input. ***
+            // ***********************************************************************************
+
+            @if $large-mobile-cols != null and $large-mobile-col-repeat == null {
+                // Manual creation of the grid
+        
+                --cols: [sub-grid-col-start] #{$large-mobile-cols} [sub-grid-col-end];
+        
+                $large-mobile-col-repeat: list.length($large-mobile-cols);
+        
+            }@else if $large-mobile-cols == null and $large-mobile-col-repeat != null{
+                // Repeat a default
+        
+                --cols: [sub-grid-col-start] repeat(#{$large-mobile-col-repeat},[col] 1fr) [sub-grid-col-end];
+        
+            }@else if $large-mobile-cols != null and $large-mobile-col-repeat != null{
+                // Repeat users input X amount of times
+        
+                --cols: [sub-grid-col-start] repeat(#{$large-mobile-col-repeat}, #{$large-mobile-cols}) [sub-grid-col-end];
+        
+                $large-mobile-col-repeat: list.length($large-mobile-cols) * $large-mobile-col-repeat;
+        
+            }@else {
+                // No user input so just create a single collumn (or default)
+        
+                --cols: [sub-grid-col-start] 1fr [sub-grid-col-end];
+        
+                $large-mobile-col-repeat: 1;
+            }
+
+
+
+            // ********************************************************************************
+            // (large-mobile)  This section creates the row part of the grid based on user input. ***
+            // ********************************************************************************
+            
+            @if $large-mobile-rows != null and $large-mobile-row-repeat == null {
+                // Full manual
+        
+                --rows: [sub-grid-row-start] #{$large-mobile-rows} [sub-grid-row-end];
+        
+                $large-mobile-row-repeat: list.length($large-mobile-rows);
+        
+            }@else if $large-mobile-rows == null and $large-mobile-row-repeat != null{
+                // Repeat default
+        
+                --rows: [sub-grid-row-start] repeat(#{$large-mobile-row-repeat}, [row] auto) [sub-grid-row-end];
+        
+            }@else if $large-mobile-rows != null and $large-mobile-row-repeat != null{
+                // Repeat users input X amount of times
+        
+                --rows: [sub-grid-row-start] repeat(#{$large-mobile-row-repeat}, #{$large-mobile-rows}) [sub-grid-row-end];
+        
+                $large-mobile-row-repeat: list.length($large-mobile-rows) * $large-mobile-row-repeat;
+        
+            }@else {
+                // No user input so just create a single row (or default)
+        
+                --rows: [sub-grid-row-start] auto [sub-grid-row-end];
+        
+                $large-mobile-row-repeat: 1;
+        
+            }
+
+ 
+            // *********************************************************************************************
+            // (large-mobile) This section creates the variables for the items that are placed into the grid.  ***
+            // *********************************************************************************************
+    
+            // Check and setup the layout of the items, if able to.
+            @if $large-mobile-col-repeat > 0 and $large-mobile-row-repeat > 0 and $large-mobile-auto-items{
+                $count: 1;
+                @for $i from 1 through $large-mobile-row-repeat{
+                    @for $j from 1 through $large-mobile-col-repeat{
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }@else if $large-mobile-custom-items != null and $large-mobile-auto-items == false{
+        
+                @if type-of($large-mobile-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $large-mobile-custom-items {
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($large-mobile-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $large-mobile-custom-items {
+                        --sub-grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $large-mobile-custom-items {
+                        @if string.index($name, "/") == null {
+                            --sub-grid-item-#{$name}: #{$name};
+                        }@else {
+                            --sub-grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     
     
@@ -1666,6 +1892,182 @@ $sdt: $standard-desktop-threshold;
     }
 
 
+
+    
+    // ********************
+    // *** LARGE TABLET ***
+    // ********************
+
+    @if type-of($large-tablet-threshold) == type-of(0) and $large-tablet-threshold > 0 {
+        @media screen and (min-width: $large-tablet-threshold){
+        
+            // ********************************************************************
+            // This section changes the layout if needed for the table layout.  ***
+            // ********************************************************************
+            
+            @if $height != $large-tablet-height {
+                --height: #{$large-tablet-height};
+            }
+
+            @if $width != $large-tablet-width {
+                --width: #{$large-tablet-width};
+            }
+
+            @if $background != $large-tablet-background {
+                --bg: #{$large-tablet-background};
+            }
+    
+            @if $justify-items != $large-tablet-justify-items {
+                justify-items: #{$large-tablet-justify-items};
+            }
+
+            @if $align-items != $large-tablet-align-items {
+                align-items: #{$large-tablet-align-items};
+            }
+
+            @if $col-gap != $large-tablet-col-gap {
+                --col-gap: #{$large-tablet-col-gap};
+            }
+
+            @if $row-gap != $large-tablet-row-gap {
+                --row-gap: #{$large-tablet-row-gap};
+            }
+
+
+            // *************************************************************************
+            // This section converts the input into a string, for the large-tablet layout. ***
+            // *************************************************************************
+
+            @if $large-tablet-grid-areas != null {
+
+                $temp: null;
+
+                @each $area in $large-tablet-grid-areas {
+
+                    $temp: $temp + "\"" + $area + "\" ";
+
+                }
+
+                $large-tablet-grid-areas: $temp;
+                --ga: #{$large-tablet-grid-areas};
+            }
+
+
+
+            // ***********************************************************************************
+            // (large-tablet)  This section creates the column part of the grid based on user input. ***
+            // ***********************************************************************************
+
+            @if $large-tablet-cols != null and $large-tablet-col-repeat == null {
+                // Manual creation of the grid
+        
+                --cols: [sub-grid-col-start] #{$large-tablet-cols} [sub-grid-col-end];
+        
+                $large-tablet-col-repeat: list.length($large-tablet-cols);
+        
+            }@else if $large-tablet-cols == null and $large-tablet-col-repeat != null{
+                // Repeat a default
+        
+                --cols: [sub-grid-col-start] repeat(#{$large-tablet-col-repeat},[col] 1fr) [sub-grid-col-end];
+        
+            }@else if $large-tablet-cols != null and $large-tablet-col-repeat != null{
+                // Repeat users input X amount of times
+        
+                --cols: [sub-grid-col-start] repeat(#{$large-tablet-col-repeat}, #{$large-tablet-cols}) [sub-grid-col-end];
+        
+                $large-tablet-col-repeat: list.length($large-tablet-cols) * $large-tablet-col-repeat;
+        
+            }@else {
+                // No user input so just create a single collumn (or default)
+        
+                --cols: [sub-grid-col-start] 1fr [sub-grid-col-end];
+        
+                $large-tablet-col-repeat: 1;
+            }
+
+
+
+            // ********************************************************************************
+            // (large-tablet)  This section creates the row part of the grid based on user input. ***
+            // ********************************************************************************
+            
+            @if $large-tablet-rows != null and $large-tablet-row-repeat == null {
+                // Full manual
+        
+                --rows: [sub-grid-row-start] #{$large-tablet-rows} [sub-grid-row-end];
+        
+                $large-tablet-row-repeat: list.length($large-tablet-rows);
+        
+            }@else if $large-tablet-rows == null and $large-tablet-row-repeat != null{
+                // Repeat default
+        
+                --rows: [sub-grid-row-start] repeat(#{$large-tablet-row-repeat}, [row] auto) [sub-grid-row-end];
+        
+            }@else if $large-tablet-rows != null and $large-tablet-row-repeat != null{
+                // Repeat users input X amount of times
+        
+                --rows: [sub-grid-row-start] repeat(#{$large-tablet-row-repeat}, #{$large-tablet-rows}) [sub-grid-row-end];
+        
+                $large-tablet-row-repeat: list.length($large-tablet-rows) * $large-tablet-row-repeat;
+        
+            }@else {
+                // No user input so just create a single row (or default)
+        
+                --rows: [sub-grid-row-start] auto [sub-grid-row-end];
+        
+                $large-tablet-row-repeat: 1;
+        
+            }
+
+ 
+            // *********************************************************************************************
+            // (large-tablet) This section creates the variables for the items that are placed into the grid.  ***
+            // *********************************************************************************************
+    
+            // Check and setup the layout of the items, if able to.
+            @if $large-tablet-col-repeat > 0 and $large-tablet-row-repeat > 0 and $large-tablet-auto-items{
+                $count: 1;
+                @for $i from 1 through $large-tablet-row-repeat{
+                    @for $j from 1 through $large-tablet-col-repeat{
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }@else if $large-tablet-custom-items != null and $large-tablet-auto-items == false{
+        
+                @if type-of($large-tablet-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $large-tablet-custom-items {
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($large-tablet-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $large-tablet-custom-items {
+                        --sub-grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $large-tablet-custom-items {
+                        @if string.index($name, "/") == null {
+                            --sub-grid-item-#{$name}: #{$name};
+                        }@else {
+                            --sub-grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
     // ***************
     // *** DESKTOP ***
     // ***************
@@ -1827,6 +2229,180 @@ $sdt: $standard-desktop-threshold;
                     // Type then is a List
                     $count: 1;
                     @each $name in $desktop-custom-items {
+                        @if string.index($name, "/") == null {
+                            --sub-grid-item-#{$name}: #{$name};
+                        }@else {
+                            --sub-grid-item-#{$count}: #{$name};
+                            $count: $count + 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    
+    // *********************
+    // *** LARGE DESKTOP ***
+    // *********************
+
+    @if type-of($large-desktop-threshold) == type-of(0) and $large-desktop-threshold > 0 {
+        @media screen and (min-width: $large-desktop-threshold){
+        
+            // ********************************************************************
+            // This section changes the layout if needed for the table layout.  ***
+            // ********************************************************************
+            
+            @if $height != $large-desktop-height {
+                --height: #{$large-desktop-height};
+            }
+
+            @if $width != $large-desktop-width {
+                --width: #{$large-desktop-width};
+            }
+
+            @if $background != $large-desktop-background {
+                --bg: #{$large-desktop-background};
+            }
+    
+            @if $justify-items != $large-desktop-justify-items {
+                justify-items: #{$large-desktop-justify-items};
+            }
+
+            @if $align-items != $large-desktop-align-items {
+                align-items: #{$large-desktop-align-items};
+            }
+
+            @if $col-gap != $large-desktop-col-gap {
+                --col-gap: #{$large-desktop-col-gap};
+            }
+
+            @if $row-gap != $large-desktop-row-gap {
+                --row-gap: #{$large-desktop-row-gap};
+            }
+
+
+            // *************************************************************************
+            // This section converts the input into a string, for the large-desktop layout. ***
+            // *************************************************************************
+
+            @if $large-desktop-grid-areas != null {
+
+                $temp: null;
+
+                @each $area in $large-desktop-grid-areas {
+
+                    $temp: $temp + "\"" + $area + "\" ";
+
+                }
+
+                $large-desktop-grid-areas: $temp;
+                --ga: #{$large-desktop-grid-areas};
+            }
+
+
+
+            // ***********************************************************************************
+            // (large-desktop)  This section creates the column part of the grid based on user input. ***
+            // ***********************************************************************************
+
+            @if $large-desktop-cols != null and $large-desktop-col-repeat == null {
+                // Manual creation of the grid
+        
+                --cols: [sub-grid-col-start] #{$large-desktop-cols} [sub-grid-col-end];
+        
+                $large-desktop-col-repeat: list.length($large-desktop-cols);
+        
+            }@else if $large-desktop-cols == null and $large-desktop-col-repeat != null{
+                // Repeat a default
+        
+                --cols: [sub-grid-col-start] repeat(#{$large-desktop-col-repeat},[col] 1fr) [sub-grid-col-end];
+        
+            }@else if $large-desktop-cols != null and $large-desktop-col-repeat != null{
+                // Repeat users input X amount of times
+        
+                --cols: [sub-grid-col-start] repeat(#{$large-desktop-col-repeat}, #{$large-desktop-cols}) [sub-grid-col-end];
+        
+                $large-desktop-col-repeat: list.length($large-desktop-cols) * $large-desktop-col-repeat;
+        
+            }@else {
+                // No user input so just create a single collumn (or default)
+        
+                --cols: [sub-grid-col-start] 1fr [sub-grid-col-end];
+        
+                $large-desktop-col-repeat: 1;
+            }
+
+
+
+            // ********************************************************************************
+            // (large-desktop)  This section creates the row part of the grid based on user input. ***
+            // ********************************************************************************
+            
+            @if $large-desktop-rows != null and $large-desktop-row-repeat == null {
+                // Full manual
+        
+                --rows: [sub-grid-row-start] #{$large-desktop-rows} [sub-grid-row-end];
+        
+                $large-desktop-row-repeat: list.length($large-desktop-rows);
+        
+            }@else if $large-desktop-rows == null and $large-desktop-row-repeat != null{
+                // Repeat default
+        
+                --rows: [sub-grid-row-start] repeat(#{$large-desktop-row-repeat}, [row] auto) [sub-grid-row-end];
+        
+            }@else if $large-desktop-rows != null and $large-desktop-row-repeat != null{
+                // Repeat users input X amount of times
+        
+                --rows: [sub-grid-row-start] repeat(#{$large-desktop-row-repeat}, #{$large-desktop-rows}) [sub-grid-row-end];
+        
+                $large-desktop-row-repeat: list.length($large-desktop-rows) * $large-desktop-row-repeat;
+        
+            }@else {
+                // No user input so just create a single row (or default)
+        
+                --rows: [sub-grid-row-start] auto [sub-grid-row-end];
+        
+                $large-desktop-row-repeat: 1;
+        
+            }
+
+ 
+            // *********************************************************************************************
+            // (large-desktop) This section creates the variables for the items that are placed into the grid.  ***
+            // *********************************************************************************************
+    
+            // Check and setup the layout of the items, if able to.
+            @if $large-desktop-col-repeat > 0 and $large-desktop-row-repeat > 0 and $large-desktop-auto-items{
+                $count: 1;
+                @for $i from 1 through $large-desktop-row-repeat{
+                    @for $j from 1 through $large-desktop-col-repeat{
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }
+            }@else if $large-desktop-custom-items != null and $large-desktop-auto-items == false{
+        
+                @if type-of($large-desktop-custom-items) == type-of(1){
+                    // Type is number
+                    // Not sure how useful this one will be.
+                    $count: 1;
+                    @for $i from 1 through $large-desktop-custom-items {
+                        --sub-grid-item-#{$count}: #{$i} / #{$j} / #{1 + $i} / #{1 + $j};
+                        $count: $count + 1;
+                    }
+                }@else if type-of($large-desktop-custom-items) == type-of(("":"")){
+                    // Type is map
+                    @each $name, $area in $large-desktop-custom-items {
+                        --sub-grid-item-#{$name}: #{$area};
+                    }
+        
+                }@else {
+                    // Type then is a List
+                    $count: 1;
+                    @each $name in $large-desktop-custom-items {
                         @if string.index($name, "/") == null {
                             --sub-grid-item-#{$name}: #{$name};
                         }@else {
